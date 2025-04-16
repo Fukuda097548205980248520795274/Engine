@@ -22,9 +22,6 @@
     <Filter Include="Class\Engine\Func">
       <UniqueIdentifier>{f66d1a58-a47a-498f-bcba-17e098ac89a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Class\Engine\Func\WindowProc">
-      <UniqueIdentifier>{35fd4dbc-398d-4cdc-a991-a74d9a60e6a3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Class\Engine\Func\String">
       <UniqueIdentifier>{b2b4bee1-60da-4b79-b2d6-476c9c15384f}</UniqueIdentifier>
     </Filter>
@@ -34,6 +31,18 @@
     <Filter Include="Class\Engine\Func\Create">
       <UniqueIdentifier>{c4d65c11-4c64-432a-a899-9d5a007561a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Class">
+      <UniqueIdentifier>{57218e94-deee-49e0-aea2-a511fb301b23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\Window">
+      <UniqueIdentifier>{2cc3f408-76b8-46ea-ad78-404fc969a054}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\Window\Func">
+      <UniqueIdentifier>{b57d44fe-cb0b-4e0c-80e2-f53425dd25c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\Window\Func\WindowProc">
+      <UniqueIdentifier>{35fd4dbc-398d-4cdc-a991-a74d9a60e6a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -42,8 +51,8 @@
     <ClCompile Include="Class\Engine\Engine.cpp">
       <Filter>Class\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Class\Engine\Func\WindowProc\WindowProc.cpp">
-      <Filter>Class\Engine\Func\WindowProc</Filter>
+    <ClCompile Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.cpp">
+      <Filter>Class\Engine\Class\Window\Func\WindowProc</Filter>
     </ClCompile>
     <ClCompile Include="Class\Engine\Func\StringInfo\StringInfo.cpp">
       <Filter>Class\Engine\Func\String</Filter>
@@ -54,13 +63,16 @@
     <ClCompile Include="Class\Engine\Func\Create\Create.cpp">
       <Filter>Class\Engine\Func\Create</Filter>
     </ClCompile>
+    <ClCompile Include="Class\Engine\Class\Window\Window.cpp">
+      <Filter>Class\Engine\Class\Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\Engine\Engine.h">
       <Filter>Class\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Class\Engine\Func\WindowProc\WindowProc.h">
-      <Filter>Class\Engine\Func\WindowProc</Filter>
+    <ClInclude Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.h">
+      <Filter>Class\Engine\Class\Window\Func\WindowProc</Filter>
     </ClInclude>
     <ClInclude Include="Class\Engine\Func\StringInfo\StringInfo.h">
       <Filter>Class\Engine\Func\String</Filter>
@@ -70,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Func\Create\Create.h">
       <Filter>Class\Engine\Func\Create</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\Window\Window.h">
+      <Filter>Class\Engine\Class\Window</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

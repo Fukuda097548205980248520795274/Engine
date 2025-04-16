@@ -8,7 +8,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	// メインループ
-	while(engine->ProcessMessage())
+	while(engine->IsWindowOpen())
 	{
 		
 	}

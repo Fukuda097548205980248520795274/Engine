@@ -82,19 +82,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Class\Engine\Class\Window\Window.cpp" />
     <ClCompile Include="Class\Engine\Engine.cpp" />
     <ClCompile Include="Class\Engine\Func\Create\Create.cpp" />
     <ClCompile Include="Class\Engine\Func\Get\Get.cpp" />
     <ClCompile Include="Class\Engine\Func\StringInfo\StringInfo.cpp" />
-    <ClCompile Include="Class\Engine\Func\WindowProc\WindowProc.cpp" />
+    <ClCompile Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Class\Engine\Class\Window\Window.h" />
     <ClInclude Include="Class\Engine\Engine.h" />
     <ClInclude Include="Class\Engine\Func\Create\Create.h" />
     <ClInclude Include="Class\Engine\Func\Get\Get.h" />
     <ClInclude Include="Class\Engine\Func\StringInfo\StringInfo.h" />
-    <ClInclude Include="Class\Engine\Func\WindowProc\WindowProc.h" />
+    <ClInclude Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
