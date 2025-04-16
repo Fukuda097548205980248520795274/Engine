@@ -9,3 +9,13 @@
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+
+/// <summary>
+/// DescriptorHeapを生成する
+/// </summary>
+/// <param name="device"></param>
+/// <param name="heapType">ヒープの種類</param>
+/// <param name="nunDescriptors">ディスクリプタの数</param>
+/// <param name="shaderVisible"></param>
+/// <returns></returns>
+ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT nunDescriptors, bool  shaderVisible);

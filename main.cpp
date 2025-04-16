@@ -10,7 +10,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// メインループ
 	while(engine->IsWindowOpen())
 	{
-		
+		///
+		/// ↓ 更新処理ここから
+		/// 
+
+		///
+		/// ↑ 更新処理ここまで
+		/// 
+
+		engine->preDraw();
+
+		///
+		/// ↓ 描画処理ここから
+		/// 
+
+		///
+		/// ↑ 描画処理ここまで
+		/// 
+
+		engine->postDraw();
 	}
 
 

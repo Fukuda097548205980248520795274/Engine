@@ -43,6 +43,15 @@
     <Filter Include="Class\Engine\Class\Window\Func\WindowProc">
       <UniqueIdentifier>{35fd4dbc-398d-4cdc-a991-a74d9a60e6a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Class\Export">
+      <UniqueIdentifier>{d67664ee-d7f6-4421-a485-44323fd1b9c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\SwapChain">
+      <UniqueIdentifier>{8a7f8bad-ee62-4990-b877-5a288c739fc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\Commands">
+      <UniqueIdentifier>{d4c6f924-d0e2-4a72-9506-076deeb3671d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -66,6 +75,15 @@
     <ClCompile Include="Class\Engine\Class\Window\Window.cpp">
       <Filter>Class\Engine\Class\Window</Filter>
     </ClCompile>
+    <ClCompile Include="Class\Engine\Class\Export\Export.cpp">
+      <Filter>Class\Engine\Class\Export</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\SwapChain\SwapChain.cpp">
+      <Filter>Class\Engine\Class\SwapChain</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\Commands\Commands.cpp">
+      <Filter>Class\Engine\Class\Commands</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\Engine\Engine.h">
@@ -85,6 +103,15 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Class\Window\Window.h">
       <Filter>Class\Engine\Class\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\Export\Export.h">
+      <Filter>Class\Engine\Class\Export</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\SwapChain\SwapChain.h">
+      <Filter>Class\Engine\Class\SwapChain</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\Commands\Commands.h">
+      <Filter>Class\Engine\Class\Commands</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

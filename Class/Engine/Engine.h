@@ -6,6 +6,8 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include "Class/Window/Window.h"
+#include "Class/Commands/Commands.h"
+#include "Class/SwapChain/SwapChain.h"
 #include "Func/StringInfo/StringInfo.h"
 #include "Func/Create/Create.h"
 #include "Func/Get/Get.h"
@@ -26,6 +28,12 @@ public:
 	// ウィンドウが開いているかどうか
 	bool IsWindowOpen();
 
+	// 描画前処理
+	void preDraw();
+
+	// 描画後処理
+	void postDraw();
+
 
 private:
 
@@ -33,7 +41,6 @@ private:
 	Window* window_;
 
 
-	/*   DirectX   */
 
 	// DXGIファクトリ
 	IDXGIFactory7* dxgiFactory_ = nullptr;
@@ -43,5 +50,30 @@ private:
 
 	// デバイス
 	ID3D12Device* device_ = nullptr;
+
+
+	// コマンド
+	Commands* commands_;
+
+
+	// RTVのディスクリプタの数
+	const UINT numRtvDescriptor_ = 2;
+
+	// RTV用のディスクリプタ
+	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
+
+
+	// スワップチェーン
+	SwapChain* swapChain_;
+
+	// スワップチェーンのリソース
+	ID3D12Resource* swapChainResource_[2] = { nullptr };
+
+
+	// RTVの設定
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
+	
+	// RTVディスクリプタ と スワップチェーンのリソース を紐づける
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
 };
 

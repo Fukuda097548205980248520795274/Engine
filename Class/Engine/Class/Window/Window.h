@@ -13,6 +13,9 @@ public:
 	// ウィンドウの応答処理
 	int ProcessMessage();
 
+	// Getter
+	HWND GetHwnd() { return hwnd_; }
+
 
 private:
 
