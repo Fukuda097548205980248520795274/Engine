@@ -13,10 +13,36 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Class">
+      <UniqueIdentifier>{243b359c-d112-4269-904e-a6f8d5a5b513}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine">
+      <UniqueIdentifier>{ced7430c-54fd-40ff-a2ad-9115af00652c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Func">
+      <UniqueIdentifier>{f66d1a58-a47a-498f-bcba-17e098ac89a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Func\WindowProc">
+      <UniqueIdentifier>{35fd4dbc-398d-4cdc-a991-a74d9a60e6a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Class\Engine\Engine.cpp">
+      <Filter>Class\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Func\WindowProc\WindowProc.cpp">
+      <Filter>Class\Engine\Func\WindowProc</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Class\Engine\Engine.h">
+      <Filter>Class\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Func\WindowProc\WindowProc.h">
+      <Filter>Class\Engine\Func\WindowProc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
