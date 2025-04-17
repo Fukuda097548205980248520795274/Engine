@@ -7,6 +7,9 @@ class Window
 {
 public:
 
+	// デストラクタ
+	~Window();
+
 	// 初期化
 	void Initialize(const int32_t kClientWdith , const int32_t kClientHeight);
 

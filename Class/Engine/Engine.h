@@ -5,15 +5,19 @@
 #include <cassert>
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <dxgidebug.h>
 #include "Class/Window/Window.h"
+#include "Class/ErrorDetection/ErrorDetection.h"
 #include "Class/Commands/Commands.h"
 #include "Class/SwapChain/SwapChain.h"
 #include "Func/StringInfo/StringInfo.h"
 #include "Func/Create/Create.h"
 #include "Func/Get/Get.h"
+#include "Func/TransitionBarrier/TransitionBarrier.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dxguid.lib")
 
 class Engine
 {
@@ -39,6 +43,9 @@ private:
 
 	// ウィンドウ
 	Window* window_;
+
+	// エラーを感知するクラス
+	ErrorDetection* errorDetection_;
 
 
 
@@ -75,5 +82,11 @@ private:
 	
 	// RTVディスクリプタ と スワップチェーンのリソース を紐づける
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+
+
+	// FenceとEvent
+	ID3D12Fence* fence_ = nullptr;
+	uint64_t fenceValue_ = 0;
+	HANDLE fenceEvent_{};
 };
 

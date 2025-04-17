@@ -83,7 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Class\Engine\Class\Commands\Commands.cpp" />
-    <ClCompile Include="Class\Engine\Class\Export\Export.cpp" />
+    <ClCompile Include="Class\Engine\Class\ErrorDetection\ErrorDetection.cpp" />
     <ClCompile Include="Class\Engine\Class\SwapChain\SwapChain.cpp" />
     <ClCompile Include="Class\Engine\Class\Window\Window.cpp" />
     <ClCompile Include="Class\Engine\Engine.cpp" />
@@ -91,11 +91,12 @@
     <ClCompile Include="Class\Engine\Func\Get\Get.cpp" />
     <ClCompile Include="Class\Engine\Func\StringInfo\StringInfo.cpp" />
     <ClCompile Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.cpp" />
+    <ClCompile Include="Class\Engine\Func\TransitionBarrier\TransitionBarrier.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Class\Engine\Class\Commands\Commands.h" />
-    <ClInclude Include="Class\Engine\Class\Export\Export.h" />
+    <ClInclude Include="Class\Engine\Class\ErrorDetection\ErrorDetection.h" />
     <ClInclude Include="Class\Engine\Class\SwapChain\SwapChain.h" />
     <ClInclude Include="Class\Engine\Class\Window\Window.h" />
     <ClInclude Include="Class\Engine\Engine.h" />
@@ -103,6 +104,7 @@
     <ClInclude Include="Class\Engine\Func\Get\Get.h" />
     <ClInclude Include="Class\Engine\Func\StringInfo\StringInfo.h" />
     <ClInclude Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.h" />
+    <ClInclude Include="Class\Engine\Func\TransitionBarrier\TransitionBarrier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

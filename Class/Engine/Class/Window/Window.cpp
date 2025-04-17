@@ -1,5 +1,11 @@
 #include "Window.h"
 
+// デストラクタ
+Window::~Window()
+{
+	CloseWindow(hwnd_);
+}
+
 /// <summary>
 /// 初期化
 /// </summary>

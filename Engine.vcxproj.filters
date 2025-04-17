@@ -43,14 +43,17 @@
     <Filter Include="Class\Engine\Class\Window\Func\WindowProc">
       <UniqueIdentifier>{35fd4dbc-398d-4cdc-a991-a74d9a60e6a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Class\Engine\Class\Export">
-      <UniqueIdentifier>{d67664ee-d7f6-4421-a485-44323fd1b9c4}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Class\Engine\Class\SwapChain">
       <UniqueIdentifier>{8a7f8bad-ee62-4990-b877-5a288c739fc9}</UniqueIdentifier>
     </Filter>
     <Filter Include="Class\Engine\Class\Commands">
       <UniqueIdentifier>{d4c6f924-d0e2-4a72-9506-076deeb3671d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\Error">
+      <UniqueIdentifier>{d67664ee-d7f6-4421-a485-44323fd1b9c4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Func\TransitionBarrier">
+      <UniqueIdentifier>{82d38c08-9651-4a03-ad47-e571e2b7a042}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -75,14 +78,17 @@
     <ClCompile Include="Class\Engine\Class\Window\Window.cpp">
       <Filter>Class\Engine\Class\Window</Filter>
     </ClCompile>
-    <ClCompile Include="Class\Engine\Class\Export\Export.cpp">
-      <Filter>Class\Engine\Class\Export</Filter>
+    <ClCompile Include="Class\Engine\Class\ErrorDetection\ErrorDetection.cpp">
+      <Filter>Class\Engine\Class\Error</Filter>
     </ClCompile>
     <ClCompile Include="Class\Engine\Class\SwapChain\SwapChain.cpp">
       <Filter>Class\Engine\Class\SwapChain</Filter>
     </ClCompile>
     <ClCompile Include="Class\Engine\Class\Commands\Commands.cpp">
       <Filter>Class\Engine\Class\Commands</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Func\TransitionBarrier\TransitionBarrier.cpp">
+      <Filter>Class\Engine\Func\TransitionBarrier</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,14 +110,17 @@
     <ClInclude Include="Class\Engine\Class\Window\Window.h">
       <Filter>Class\Engine\Class\Window</Filter>
     </ClInclude>
-    <ClInclude Include="Class\Engine\Class\Export\Export.h">
-      <Filter>Class\Engine\Class\Export</Filter>
+    <ClInclude Include="Class\Engine\Class\ErrorDetection\ErrorDetection.h">
+      <Filter>Class\Engine\Class\Error</Filter>
     </ClInclude>
     <ClInclude Include="Class\Engine\Class\SwapChain\SwapChain.h">
       <Filter>Class\Engine\Class\SwapChain</Filter>
     </ClInclude>
     <ClInclude Include="Class\Engine\Class\Commands\Commands.h">
       <Filter>Class\Engine\Class\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Func\TransitionBarrier\TransitionBarrier.h">
+      <Filter>Class\Engine\Func\TransitionBarrier</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
