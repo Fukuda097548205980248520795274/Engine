@@ -24,6 +24,7 @@
 #include "Func/Create/Create.h"
 #include "Func/Get/Get.h"
 #include "Func/TransitionBarrier/TransitionBarrier.h"
+#include "Func/Crash/Crash.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -45,7 +46,7 @@ public:
 	// フレーム開始
 	void BeginFrame();
 
-	// 描画後処理
+	// フレーム終了
 	void EndFrame();
 
 	// 三角形を描画する

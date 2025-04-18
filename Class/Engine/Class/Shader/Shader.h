@@ -29,7 +29,7 @@ public:
 	void Initialize();
 
 	// シェーダーをコンパイルする
-	IDxcBlob* CompilerShader(const std::wstring& filePath, const wchar_t* profile);
+	IDxcBlob* CompilerShader(std::ostream& os, const std::wstring& filePath, const wchar_t* profile);
 
 
 private:

@@ -18,7 +18,7 @@ IDXGIFactory7* GetDXGIFactory()
 /// </summary>
 /// <param name="dxgiFactory"></param>
 /// <returns></returns>
-IDXGIAdapter4* GetUseAdapter(IDXGIFactory7* dxgiFactory)
+IDXGIAdapter4* GetUseAdapter(std::ostream& os, IDXGIFactory7* dxgiFactory)
 {
 	// 使用するアダプタ（GPU）
 	IDXGIAdapter4* useAdapter = nullptr;
@@ -37,7 +37,7 @@ IDXGIAdapter4* GetUseAdapter(IDXGIFactory7* dxgiFactory)
 		if (!(adapterDesc.Flags & DXGI_ADAPTER_FLAG3_SOFTWARE))
 		{
 			// 採用したアダプタの情報をログに出力
-			Log(ConvertString(std::format(L"Use Adapter : {} \n", adapterDesc.Description)));
+			Log(os ,ConvertString(std::format(L"Use Adapter : {} \n", adapterDesc.Description)));
 			break;
 		}
 
@@ -55,7 +55,7 @@ IDXGIAdapter4* GetUseAdapter(IDXGIFactory7* dxgiFactory)
 /// </summary>
 /// <param name="useAdapter">使用するアダプタ（GPU）</param>
 /// <returns></returns>
-ID3D12Device* GetDevice(IDXGIAdapter4* useAdapter)
+ID3D12Device* GetDevice(std::ostream& os, IDXGIAdapter4* useAdapter)
 {
 	ID3D12Device* device = nullptr;
 
@@ -78,7 +78,7 @@ ID3D12Device* GetDevice(IDXGIAdapter4* useAdapter)
 		if (SUCCEEDED(hr))
 		{
 			// ログを出力する
-			Log(std::format("FeatureLevel : {} \n", featureLevelStrings[i]));
+			Log(os,std::format("FeatureLevel : {} \n", featureLevelStrings[i]));
 			break;
 		}
 	}

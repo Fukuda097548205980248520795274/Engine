@@ -53,6 +53,8 @@ Engine::~Engine()
 	// ウィンドウ
 	delete window_;
 
+	// COMの終了
+	CoUninitialize();
 
 	// リソースリークチェッカー
 	IDXGIDebug1* debug;
@@ -68,6 +70,34 @@ Engine::~Engine()
 // 初期化
 void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight)
 {
+	// ログのディレクトリを用意する
+	std::filesystem::create_directory("Class/Engine/Logs");
+
+	// 現在時刻を取得
+	std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+
+	// ログファイルの名前にコンマ何秒はいらないので、削って秒にする
+	std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> nowSeconds =
+		std::chrono::time_point_cast<std::chrono::seconds>(now);
+
+	// 日本時間（PCの設定時間）に変換
+	std::chrono::zoned_time localTime{ std::chrono::current_zone(), nowSeconds };
+
+	// formatを使って年月日_時分秒の文字列に変換
+	std::string dateString = std::format("{:%Y%m&d_%H%M%S}", localTime);
+
+	// 時刻を使ってファイル名を決定
+	std::string logFilePath = std::string("Class/Engine/Logs/") + dateString + ".log";
+
+	// ファイルを作って書き込み準備
+	std::ofstream logStream(logFilePath);
+
+
+
+	// COMの初期化
+	CoInitializeEx(0, COINIT_MULTITHREADED);
+
+	SetUnhandledExceptionFilter(ExportDump);
 
 	// ウィンドウの生成と初期化
 	window_ = new Window();
@@ -86,13 +116,13 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	dxgiFactory_ = GetDXGIFactory();
 
 	// 使用するアダプタ（GPU）を取得する
-	useAdapter_ = GetUseAdapter(dxgiFactory_);
+	useAdapter_ = GetUseAdapter(logStream,dxgiFactory_);
 
 	// Deviceを取得する
-	device_ = GetDevice(useAdapter_);
+	device_ = GetDevice(logStream,useAdapter_);
 
 	// 初期化完了!!!
-	Log("Complate create ID3D12Device!! \n");
+	Log(logStream,"Complate create ID3D12Device!! \n");
 
 
 	// エラーを検知したら停止する
@@ -191,7 +221,7 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
 	if (FAILED(hr))
 	{
-		Log(reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
+		Log(logStream,reinterpret_cast<char*>(errorBlob_->GetBufferPointer()));
 		assert(false);
 	}
 
@@ -233,10 +263,10 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 
 	/*   シェーダーをコンパイルする   */
 
-	vertexShaderBlob_ = shader_->CompilerShader(L"./Class/Engine/Shader/Object3D.VS.hlsl", L"vs_6_0");
+	vertexShaderBlob_ = shader_->CompilerShader(logStream,L"./Class/Engine/Shader/Object3D.VS.hlsl", L"vs_6_0");
 	assert(vertexShaderBlob_ != nullptr);
 
-	pixelShaderBlob_ = shader_->CompilerShader(L"./Class/Engine/Shader/Object3D.PS.hlsl", L"ps_6_0");
+	pixelShaderBlob_ = shader_->CompilerShader(logStream,L"./Class/Engine/Shader/Object3D.PS.hlsl", L"ps_6_0");
 	assert(pixelShaderBlob_ != nullptr);
 
 
@@ -305,7 +335,7 @@ bool Engine::IsWindowOpen()
 	return false;
 }
 
-// 描画前処理
+// フレーム開始
 void Engine::BeginFrame()
 {
 	ImGui_ImplDX12_NewFrame();
@@ -331,7 +361,7 @@ void Engine::BeginFrame()
 	commands_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
-// 描画後処理
+// フレーム終了
 void Engine::EndFrame()
 {
 

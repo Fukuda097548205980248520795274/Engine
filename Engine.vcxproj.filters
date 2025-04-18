@@ -70,6 +70,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{7b23dc69-e096-420f-8b72-e06c7d423bb5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Func\Crash">
+      <UniqueIdentifier>{4e07fd19-15b8-41b1-86c4-52ca6fe4fdbe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -134,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="Class\Engine\externals\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Func\Crash\Crash.cpp">
+      <Filter>Class\Engine\Func\Crash</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +208,9 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\externals\imgui\imstb_truetype.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Func\Crash\Crash.h">
+      <Filter>Class\Engine\Func\Crash</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

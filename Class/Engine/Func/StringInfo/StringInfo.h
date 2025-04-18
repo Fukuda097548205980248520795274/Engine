@@ -1,6 +1,7 @@
 #pragma once
 #include <Windows.h>
 #include <string>
+#include <fstream>
 
 // string -> wstring に変換する
 std::wstring ConvertString(const std::string& str);
@@ -12,4 +13,4 @@ std::string ConvertString(const std::wstring& str);
 /// ログを表示する
 /// </summary>
 /// <param name="message">文字列</param>
-void Log(const std::string& message);
+void Log(std::ostream& os,const std::string& message);

@@ -40,7 +40,8 @@ std::string ConvertString(const std::wstring& str)
 /// ログを表示する
 /// </summary>
 /// <param name="message">文字列</param>
-void Log(const std::string& message)
+void Log(std::ostream& os,const std::string& message)
 {
+    os << message << std::endl;
     OutputDebugStringA(message.c_str());
 }

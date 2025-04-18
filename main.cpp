@@ -15,23 +15,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	};
 
 	// 三角形
-	Transform3D triangle =
-	{
-		{1.0f , 1.0f , 1.0f},
-		{0.0f , 0.0f , 0.0f},
-		{-5.0f , 0.0f , 0.0f}
-	};
-
-	// 三角形
-	Transform3D triangle2 =
-	{
-		{1.0f , 1.0f , 1.0f},
-		{0.0f , 0.0f , 0.0f},
-		{5.0f , 0.0f , 0.0f}
-	};
-
-	// 三角形
-	Transform3D triangle3
+	Transform3D triangle
 	{
 		{1.0f , 1.0f , 1.0f},
 		{0.0f , 0.0f , 0.0f},
@@ -41,6 +25,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// メインループ
 	while(engine->IsWindowOpen())
 	{
+		// フレーム開始
 		engine->BeginFrame();
 
 		///
@@ -48,12 +33,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// 
 
 		ImGui::Begin("Triangle");
-		ImGui::DragFloat3("Triangle2 translate", &triangle2.translate.x, 0.01f);
+		ImGui::DragFloat3("cmaera Translate", &cameraTransform.translate.x , 0.01f);
+		ImGui::DragFloat3("Triangle translate", &triangle.translate.x, 0.01f);
 		ImGui::End();
 
-		triangle.rotate.y += 0.02f;
-		triangle2.rotate.z += 0.02f;
-		triangle3.rotate.x += 0.02f;
+		triangle.rotate.z += 0.02f;
 
 		Matrix4x4 viewMatrix = Make4x4InverseMatrix(Make4x4AffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate));
 		Matrix4x4 projectionMatrix = Make4x4PerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
@@ -66,14 +50,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 描画処理ここから
 		/// 
 
-		engine->DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), 0.0f, 0.0f, 1.0f, 1.0f);
-		engine->DrawTriangle(triangle2, Multiply(viewMatrix, projectionMatrix), 1.0f, 0.0f, 0.0f, 1.0f);
-		engine->DrawTriangle(triangle3, Multiply(viewMatrix, projectionMatrix), 0.0f, 1.0f, 0.0f, 1.0f);
+		engine->DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), 1.0f, 0.0f, 0.0f, 1.0f);
 
 		///
 		/// ↑ 描画処理ここまで
 		/// 
 
+		// フレーム終了
 		engine->EndFrame();
 	}
 

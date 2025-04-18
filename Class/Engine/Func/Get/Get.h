@@ -4,6 +4,7 @@
 #include <string>
 #include <cassert>
 #include <format>
+#include <fstream>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include "../../Func/StringInfo/StringInfo.h"
@@ -22,11 +23,11 @@ IDXGIFactory7* GetDXGIFactory();
 /// </summary>
 /// <param name="dxgiFactory"></param>
 /// <returns></returns>
-IDXGIAdapter4* GetUseAdapter(IDXGIFactory7* dxgiFactory);
+IDXGIAdapter4* GetUseAdapter(std::ostream& os, IDXGIFactory7* dxgiFactory);
 
 /// <summary>
 /// Deviceを取得する
 /// </summary>
 /// <param name="useAdapter">使用するアダプタ（GPU）</param>
 /// <returns></returns>
-ID3D12Device* GetDevice(IDXGIAdapter4* useAdapter);
+ID3D12Device* GetDevice(std::ostream& os, IDXGIAdapter4* useAdapter);
