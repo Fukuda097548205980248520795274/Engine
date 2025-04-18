@@ -19,3 +19,11 @@
 /// <param name="shaderVisible"></param>
 /// <returns></returns>
 ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT nunDescriptors, bool  shaderVisible);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="device"></param>
+/// <param name="sizeInBytes"></param>
+/// <returns></returns>
+ID3D12Resource* CreateBufferResource(ID3D12Device* device, UINT sizeInBytes);
