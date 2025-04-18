@@ -26,6 +26,7 @@ public:
 	// Getter
 	IDXGISwapChain* GetSwapChain() { return swapChain_; }
 	UINT GetCurrentBackBufferIndex() { return swapChain_->GetCurrentBackBufferIndex(); }
+	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
 
 private:
 

@@ -13,6 +13,7 @@ Window::~Window()
 /// <param name="kClientHeight"></param>
 void Window::Initialize(const int32_t kClientWidth, const int32_t kClientHeight)
 {
+
 	/*-----------------------------
 		ウィンドウクラスを登録する
 	-----------------------------*/

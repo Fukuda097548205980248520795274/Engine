@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "./Func/WindowProc/WindowProc.h"
 
+
 class Window
 {
 public:

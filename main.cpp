@@ -41,11 +41,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// メインループ
 	while(engine->IsWindowOpen())
 	{
-		engine->preDraw();
+		engine->BeginFrame();
 
 		///
 		/// ↓ 更新処理ここから
 		/// 
+
+		ImGui::Begin("Triangle");
+		ImGui::DragFloat3("Triangle2 translate", &triangle2.translate.x, 0.01f);
+		ImGui::End();
 
 		triangle.rotate.y += 0.02f;
 		triangle2.rotate.z += 0.02f;
@@ -70,7 +74,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↑ 描画処理ここまで
 		/// 
 
-		engine->postDraw();
+		engine->EndFrame();
 	}
 
 

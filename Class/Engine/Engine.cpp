@@ -3,7 +3,11 @@
 // デストラクタ
 Engine::~Engine()
 {
-	for (uint32_t i = 0; i < 128; i++)
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
 		if (resourceMemories[i])
 		{
@@ -33,6 +37,7 @@ Engine::~Engine()
 	// スワップチェーン
 	delete swapChain_;
 
+	srvDescriptorHeap_->Release();
 	rtvDescriptorHeap_->Release();
 	
 	// コマンドリスト
@@ -103,8 +108,11 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	    DescriptorHeapを生成する
 	----------------------------*/
 
-	// RTV用のディスクリプタ
-	rtvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, numRtvDescriptor_, false);
+	// RTV用のディスクリプタヒープ
+	rtvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_RTV, kNumRtvDescriptor_, false);
+
+	// SRV用のディスクリプタヒープ
+	srvDescriptorHeap_ = CreateDescriptorHeap(device_, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kNunSrvDescriptor_, true);
 
 
 	/*------------------------
@@ -270,6 +278,20 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	scissorRect_.right = kClientWidth;
 	scissorRect_.top = 0;
 	scissorRect_.bottom = kClientHeight;
+
+
+	/*----------------------
+	    ImGuiを初期化する
+	----------------------*/
+
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(window_->GetHwnd());
+	ImGui_ImplDX12_Init(device_, swapChain_->GetSwapChainDesc().BufferCount, rtvDesc_.Format,
+		srvDescriptorHeap_,
+		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
+		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
 }
 
 // ウィンドウが開いているかどうか
@@ -284,8 +306,12 @@ bool Engine::IsWindowOpen()
 }
 
 // 描画前処理
-void Engine::preDraw()
+void Engine::BeginFrame()
 {
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
 	// バックバッファのインデックスを取得する
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -300,11 +326,19 @@ void Engine::preDraw()
 	float clearColor[] = { 0.1f , 0.25f , 0.5f , 1.0f };
 	commands_->GetCommandList()->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
+	// 描画用のDescriptorの設定
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_ };
+	commands_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
 // 描画後処理
-void Engine::postDraw()
+void Engine::EndFrame()
 {
+
+	ImGui::Render();
+
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commands_->GetCommandList());
+
 	// バックバッファのインデックスを取得する
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -334,7 +368,7 @@ void Engine::postDraw()
 
 
 	// 使用したリソースのアドレスを、リリース用アドレスで開放する
-	for (uint32_t i = 0; i < 128; i++)
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
 		if (resourceMemories[i])
 		{
@@ -419,7 +453,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 	    使用していないリソースメモリに記録する
 	--------------------------------------*/
 
-	for (uint32_t i = 0; i < 128; i++)
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
 		if (resourceMemories[i] == nullptr)
 		{
@@ -428,7 +462,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 		}
 	}
 
-	for (uint32_t i = 0; i < 128; i++)
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
 		if (resourceMemories[i] == nullptr)
 		{
@@ -437,7 +471,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 		}
 	}
 
-	for (uint32_t i = 0; i < 128; i++)
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
 		if (resourceMemories[i] == nullptr)
 		{

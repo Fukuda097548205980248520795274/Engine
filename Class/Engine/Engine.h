@@ -10,6 +10,9 @@
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include "Struct.h"
+#include "externals/imgui/imgui.h"
+#include "externals/imgui/imgui_impl_dx12.h"
+#include "externals/imgui/imgui_impl_win32.h"
 #include "Class/Window/Window.h"
 #include "Class/ErrorDetection/ErrorDetection.h"
 #include "Class/Commands/Commands.h"
@@ -39,11 +42,11 @@ public:
 	// ウィンドウが開いているかどうか
 	bool IsWindowOpen();
 
-	// 描画前処理
-	void preDraw();
+	// フレーム開始
+	void BeginFrame();
 
 	// 描画後処理
-	void postDraw();
+	void EndFrame();
 
 	// 三角形を描画する
 	void DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewProjectionMatrix,
@@ -78,10 +81,17 @@ private:
 
 
 	// RTVのディスクリプタの数
-	const UINT numRtvDescriptor_ = 2;
+	const UINT kNumRtvDescriptor_ = 2;
 
-	// RTV用のディスクリプタ
+	// RTV用のディスクリプタヒープ
 	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
+
+	
+	// SRVのディスクリプタの数
+	const UINT kNunSrvDescriptor_ = 128;
+
+	// SRV用のディスクリプタヒープ
+	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
 
 
 	// スワップチェーン
@@ -103,7 +113,8 @@ private:
 
 
 	// リソースを保存する場所
-	ID3D12Resource* resourceMemories[128] = { nullptr };
+	const uint32_t kNumResourceMemories = 256;
+	ID3D12Resource* resourceMemories[256] = { nullptr };
 
 
 
