@@ -55,6 +55,14 @@ public:
 	void DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewProjectionMatrix,
 		float red, float green, float blue, float alpha);
 
+	// スプライトを描画する
+	void DrawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
+		const Transform3D& transform, const Matrix4x4& viewProjectionMatrix);
+
+	// 球を描画する
+	void DrawSphere(float x, float y, float z, float radiusX, float radiusY, float radiusZ,
+		uint32_t latSubdivisions, uint32_t lonSubdivisions, const Matrix4x4& viewProjectionMatrix);
+
 
 private:
 
@@ -100,6 +108,13 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 
 
+	// DSV用のディスクリプタの数
+	const UINT kNunDsvDescriptor_ = 1;
+
+	// DSV用のディスクリプタヒープ
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvDescriptorHeap_ = nullptr;
+
+
 	// スワップチェーン
 	SwapChain* swapChain_;
 
@@ -112,6 +127,13 @@ private:
 	
 	// RTVディスクリプタ と スワップチェーンのリソース を紐づける
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
+
+
+	// デプスステンシルのリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
+
+	// DSVの設定
+	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
 
 
 	// フェンス
@@ -173,6 +195,9 @@ private:
 
 	// ラスタライザの設定
 	D3D12_RASTERIZER_DESC rasterizeDesc_{};
+
+	// デプスステンシルの設定
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
 
 	// 頂点シェーダのバイナリデータ
 	IDxcBlob* vertexShaderBlob_ = nullptr;

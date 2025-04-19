@@ -38,7 +38,20 @@
 		float m[4][4];
 	}Matrix4x4;
 
-	// 姿勢情報
+	// 姿勢情報2D
+	typedef struct Transform2D
+	{
+		// 拡縮
+		Vector2 scale;
+
+		// 回転
+		float theta;
+
+		// 移動
+		Vector2 translate;
+	}Transform2D;
+
+	// 姿勢情報3D
 	typedef struct Transform3D
 	{
 		// 拡縮
