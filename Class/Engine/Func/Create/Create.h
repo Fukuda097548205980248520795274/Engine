@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include "../../Func/StringInfo/StringInfo.h"
@@ -18,7 +19,8 @@
 /// <param name="nunDescriptors">ディスクリプタの数</param>
 /// <param name="shaderVisible"></param>
 /// <returns></returns>
-ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT nunDescriptors, bool  shaderVisible);
+Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> CreateDescriptorHeap(
+	Microsoft::WRL::ComPtr<ID3D12Device> device, D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT nunDescriptors, bool  shaderVisible);
 
 /// <summary>
 /// 
@@ -26,4 +28,4 @@ ID3D12DescriptorHeap* CreateDescriptorHeap(ID3D12Device* device, D3D12_DESCRIPTO
 /// <param name="device"></param>
 /// <param name="sizeInBytes"></param>
 /// <returns></returns>
-ID3D12Resource* CreateBufferResource(ID3D12Device* device, UINT sizeInBytes);
+Microsoft::WRL::ComPtr<ID3D12Resource> CreateBufferResource(Microsoft::WRL::ComPtr<ID3D12Device> device, UINT sizeInBytes);

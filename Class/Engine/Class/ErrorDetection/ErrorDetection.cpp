@@ -3,7 +3,7 @@
 // デストラクタ
 ErrorDetection::~ErrorDetection()
 {
-	debugController_->Release();
+	
 }
 
 // 初期化
@@ -24,9 +24,9 @@ void ErrorDetection::Initialize()
 }
 
 // エラーで停止させる
-void ErrorDetection::MakeItStop(ID3D12Device* device)
+void ErrorDetection::MakeItStop(Microsoft::WRL::ComPtr<ID3D12Device> device)
 {
-	ID3D12InfoQueue* infoQueue = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12InfoQueue> infoQueue = nullptr;
 
 	if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&infoQueue))))
 	{
@@ -39,9 +39,6 @@ void ErrorDetection::MakeItStop(ID3D12Device* device)
 		// 警告時
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
 
-
-		// 解放
-		infoQueue->Release();
 		
 		/*---------------------------
 		    抑制するエラーを指定する

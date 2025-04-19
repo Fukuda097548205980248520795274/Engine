@@ -3,13 +3,11 @@
 // デストラクタ
 Commands::~Commands()
 {
-	commandList_->Release();
-	commandAllocator_->Release();
-	commandQueue_->Release();
+	
 }
 
 // 初期化
-void Commands::Initialize(ID3D12Device* device)
+void Commands::Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device)
 {
 	// コマンドキュー
 	HRESULT hr = device->CreateCommandQueue(&commandQueueDesc_, IID_PPV_ARGS(&commandQueue_));
@@ -20,6 +18,6 @@ void Commands::Initialize(ID3D12Device* device)
 	assert(SUCCEEDED(hr));
 
 	// コマンドリスト
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_, nullptr, IID_PPV_ARGS(&commandList_));
+	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator_.Get(), nullptr, IID_PPV_ARGS(&commandList_));
 	assert(SUCCEEDED(hr));
 }

@@ -110,6 +110,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Class\Engine\Func\Matrix\Matrix.cpp" />
     <ClCompile Include="Class\Engine\Func\StringInfo\StringInfo.cpp" />
     <ClCompile Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.cpp" />
+    <ClCompile Include="Class\Engine\Func\Texture\Texture.cpp" />
     <ClCompile Include="Class\Engine\Func\TransitionBarrier\TransitionBarrier.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -135,6 +136,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Class\Engine\Func\Matrix\Matrix.h" />
     <ClInclude Include="Class\Engine\Func\StringInfo\StringInfo.h" />
     <ClInclude Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.h" />
+    <ClInclude Include="Class\Engine\Func\Texture\Texture.h" />
     <ClInclude Include="Class\Engine\Func\TransitionBarrier\TransitionBarrier.h" />
     <ClInclude Include="Class\Engine\Struct.h" />
   </ItemGroup>

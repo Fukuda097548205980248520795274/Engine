@@ -3,11 +3,13 @@
 // デストラクタ
 SwapChain::~SwapChain()
 {
-	swapChain_->Release();
+	
 }
 
 // 初期化
-void SwapChain::Initialize(HWND hwnd, IDXGIFactory7* dxgiFactory, ID3D12Device* device,ID3D12CommandQueue* commandQueue,
+void SwapChain::Initialize(HWND hwnd,
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory, Microsoft::WRL::ComPtr<ID3D12Device> device,
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue,
 	const int32_t kClientWidth, const int32_t kClientHeight)
 {
 
@@ -35,6 +37,6 @@ void SwapChain::Initialize(HWND hwnd, IDXGIFactory7* dxgiFactory, ID3D12Device* 
 	swapChainDesc_.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	HRESULT hr = dxgiFactory->CreateSwapChainForHwnd
-	(commandQueue, hwnd, &swapChainDesc_, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(&swapChain_));
+	(commandQueue.Get(), hwnd, &swapChainDesc_, nullptr, nullptr, reinterpret_cast<IDXGISwapChain1**>(swapChain_.GetAddressOf()));
 	assert(SUCCEEDED(hr));
 }

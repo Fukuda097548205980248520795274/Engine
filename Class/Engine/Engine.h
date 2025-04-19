@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include <wrl.h>
 #include <stdint.h>
 #include <string>
 #include <cassert>
@@ -25,6 +26,7 @@
 #include "Func/Get/Get.h"
 #include "Func/TransitionBarrier/TransitionBarrier.h"
 #include "Func/Crash/Crash.h"
+#include "Func/Texture/Texture.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -56,6 +58,9 @@ public:
 
 private:
 
+	// リークチェッカー
+	D3DResourceLeakChecker leakChecker;
+
 
 	/*   描画   */
 
@@ -68,13 +73,13 @@ private:
 
 
 	// DXGIファクトリ
-	IDXGIFactory7* dxgiFactory_ = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory_ = nullptr;
 
 	// 使用するアダプタ（GPU）
-	IDXGIAdapter4* useAdapter_ = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter_ = nullptr;
 
 	// デバイス
-	ID3D12Device* device_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device_ = nullptr;
 
 
 	// コマンド
@@ -85,21 +90,21 @@ private:
 	const UINT kNumRtvDescriptor_ = 2;
 
 	// RTV用のディスクリプタヒープ
-	ID3D12DescriptorHeap* rtvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap_ = nullptr;
 
 	
 	// SRVのディスクリプタの数
 	const UINT kNunSrvDescriptor_ = 128;
 
 	// SRV用のディスクリプタヒープ
-	ID3D12DescriptorHeap* srvDescriptorHeap_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap_ = nullptr;
 
 
 	// スワップチェーン
 	SwapChain* swapChain_;
 
 	// スワップチェーンのリソース
-	ID3D12Resource* swapChainResource_[2] = { nullptr };
+	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResource_[2] = { nullptr };
 
 
 	// RTVの設定
@@ -115,7 +120,18 @@ private:
 
 	// リソースを保存する場所
 	const uint32_t kNumResourceMemories = 256;
-	ID3D12Resource* resourceMemories[256] = { nullptr };
+	Microsoft::WRL::ComPtr<ID3D12Resource> resourceMemories[256] = { nullptr };
+
+
+
+	/*   テクスチャ   */
+
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_{};
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_ = nullptr;
+
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_{};
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_{};
 
 
 
@@ -159,7 +175,7 @@ private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_{};
 
 	// PSO
-	ID3D12PipelineState* graphicsPipelineState_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;
 
 	// ビューポート
 	D3D12_VIEWPORT viewport_{};

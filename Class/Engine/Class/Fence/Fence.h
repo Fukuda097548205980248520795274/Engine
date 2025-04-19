@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -20,16 +21,16 @@ public:
 	~Fence();
 
 	// 初期化
-	void Initialize(ID3D12Device* device);
+	void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device);
 
 	// GPUを待つ
-	void WaitForGPU(ID3D12CommandQueue* commandQueue);
+	void WaitForGPU(Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue);
 
 
 private:
 
 	// フェンス
-	ID3D12Fence* fence_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Fence> fence_ = nullptr;
 
 	// フェンスが指定した値
 	uint64_t fenceValue_ = 0;

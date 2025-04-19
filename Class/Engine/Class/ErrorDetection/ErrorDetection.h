@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include "../../Func/StringInfo/StringInfo.h"
@@ -21,13 +22,13 @@ public:
 	void Initialize();
 
 	// エラーで停止させる
-	void MakeItStop(ID3D12Device* deivce);
+	void MakeItStop(Microsoft::WRL::ComPtr<ID3D12Device> device);
 
 
 private:
 
 	// デバッグコントローラ
-	ID3D12Debug1* debugController_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Debug1> debugController_ = nullptr;
 	
 };
 

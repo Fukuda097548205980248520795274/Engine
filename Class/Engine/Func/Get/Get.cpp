@@ -4,9 +4,9 @@
 /// DXGIfactoryを取得する
 /// </summary>
 /// <returns></returns>
-IDXGIFactory7* GetDXGIFactory()
+Microsoft::WRL::ComPtr<IDXGIFactory7> GetDXGIFactory()
 {
-	IDXGIFactory7* dxgiFactory = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory = nullptr;
 	HRESULT hr = CreateDXGIFactory(IID_PPV_ARGS(&dxgiFactory));
 	assert(SUCCEEDED(hr));
 
@@ -18,10 +18,10 @@ IDXGIFactory7* GetDXGIFactory()
 /// </summary>
 /// <param name="dxgiFactory"></param>
 /// <returns></returns>
-IDXGIAdapter4* GetUseAdapter(std::ostream& os, IDXGIFactory7* dxgiFactory)
+Microsoft::WRL::ComPtr<IDXGIAdapter4> GetUseAdapter(std::ostream& os, Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory)
 {
 	// 使用するアダプタ（GPU）
-	IDXGIAdapter4* useAdapter = nullptr;
+	Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter = nullptr;
 
 	// 良い順にアダプタを頼む
 	for (UINT i = 0;
@@ -55,9 +55,9 @@ IDXGIAdapter4* GetUseAdapter(std::ostream& os, IDXGIFactory7* dxgiFactory)
 /// </summary>
 /// <param name="useAdapter">使用するアダプタ（GPU）</param>
 /// <returns></returns>
-ID3D12Device* GetDevice(std::ostream& os, IDXGIAdapter4* useAdapter)
+Microsoft::WRL::ComPtr<ID3D12Device> GetDevice(std::ostream& os, Microsoft::WRL::ComPtr<IDXGIAdapter4> useAdapter)
 {
-	ID3D12Device* device = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12Device> device = nullptr;
 
 	// 機能レベル
 	D3D_FEATURE_LEVEL featureLevels[] =
@@ -72,7 +72,7 @@ ID3D12Device* GetDevice(std::ostream& os, IDXGIAdapter4* useAdapter)
 	for (size_t i = 0; i < _countof(featureLevels); ++i)
 	{
 		// 採用したアダプタででデバイスを生成する
-		HRESULT hr = D3D12CreateDevice(useAdapter, featureLevels[i], IID_PPV_ARGS(&device));
+		HRESULT hr = D3D12CreateDevice(useAdapter.Get(), featureLevels[i], IID_PPV_ARGS(&device));
 		
 		// 指定した機能レベルでDeviceを生成できたかを確認する
 		if (SUCCEEDED(hr))

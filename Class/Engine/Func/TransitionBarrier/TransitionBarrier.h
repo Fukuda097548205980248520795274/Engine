@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
@@ -15,5 +16,5 @@
 /// <param name="commandList"></param>
 /// <param name="before">現在のResourceState</param>
 /// <param name="after">遷移後のResourceState</param>
-void TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* swapChainResources,
+void TransitionBarrier(Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList, Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResources,
 	D3D12_RESOURCE_STATES before, D3D12_RESOURCE_STATES after);

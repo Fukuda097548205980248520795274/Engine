@@ -20,18 +20,20 @@ public:
 	~SwapChain();
 
 	// 初期化
-	void Initialize(HWND hwnd, IDXGIFactory7* dxgiFactory, ID3D12Device* device, ID3D12CommandQueue* commandQueue,
+	void Initialize(HWND hwnd, 
+		Microsoft::WRL::ComPtr<IDXGIFactory7> dxgiFactory, Microsoft::WRL::ComPtr<ID3D12Device> device,
+		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue,
 		const int32_t kClientWidth, const int32_t kClientHeight);
 
 	// Getter
-	IDXGISwapChain* GetSwapChain() { return swapChain_; }
+	Microsoft::WRL::ComPtr<IDXGISwapChain4>  GetSwapChain() { return swapChain_; }
 	UINT GetCurrentBackBufferIndex() { return swapChain_->GetCurrentBackBufferIndex(); }
 	DXGI_SWAP_CHAIN_DESC1 GetSwapChainDesc() { return swapChainDesc_; }
 
 private:
 
 	// スワップチェーン
-	IDXGISwapChain4* swapChain_ = nullptr;
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain_ = nullptr;
 
 	// スワップチェーンの設定
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc_{};

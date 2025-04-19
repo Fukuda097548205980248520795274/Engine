@@ -7,15 +7,6 @@ Engine::~Engine()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 
-	for (uint32_t i = 0; i < kNumResourceMemories; i++)
-	{
-		if (resourceMemories[i])
-		{
-			resourceMemories[i]->Release();
-		}
-	}
-
-	graphicsPipelineState_->Release();
 	pixelShaderBlob_->Release();
 	vertexShaderBlob_->Release();
 	rootSignature_->Release();
@@ -31,21 +22,11 @@ Engine::~Engine()
 	// フェンス
 	delete fence_;
 
-	swapChainResource_[0]->Release();
-	swapChainResource_[1]->Release();
-
 	// スワップチェーン
 	delete swapChain_;
-
-	srvDescriptorHeap_->Release();
-	rtvDescriptorHeap_->Release();
 	
 	// コマンドリスト
 	delete commands_;
-
-	device_->Release();
-	useAdapter_->Release();
-	dxgiFactory_->Release();
 
 	// エラー検知
 	delete errorDetection_;
@@ -55,21 +36,12 @@ Engine::~Engine()
 
 	// COMの終了
 	CoUninitialize();
-
-	// リソースリークチェッカー
-	IDXGIDebug1* debug;
-	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&debug))))
-	{
-		debug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_APP, DXGI_DEBUG_RLO_ALL);
-		debug->ReportLiveObjects(DXGI_DEBUG_D3D12, DXGI_DEBUG_RLO_ALL);
-		debug->Release();
-	}
 }
 
 // 初期化
 void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight)
 {
+
 	// ログのディレクトリを用意する
 	std::filesystem::create_directory("Class/Engine/Logs");
 
@@ -178,16 +150,46 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 
 	// 1つめ　先頭
 	rtvHandles_[0] = rtvStartHandle;
-	device_->CreateRenderTargetView(swapChainResource_[0], &rtvDesc_ , rtvHandles_[0]);
+	device_->CreateRenderTargetView(swapChainResource_[0].Get(), &rtvDesc_, rtvHandles_[0]);
 
 	// 2つめ
 	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	device_->CreateRenderTargetView(swapChainResource_[1], &rtvDesc_, rtvHandles_[1]);
+	device_->CreateRenderTargetView(swapChainResource_[1].Get(), &rtvDesc_, rtvHandles_[1]);
 
 
 	// Fenceの生成と初期化
 	fence_ = new Fence();
 	fence_->Initialize(device_);
+
+
+	/*---------------
+	    テクスチャ
+	---------------*/
+
+	// テクスチャ用のリソース
+	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	textureResource_ = CreateTextureResource(device_, metadata);
+	UploadTextureData(textureResource_, mipImages);
+
+	// metaDataを基にSRVを作成する
+	srvDesc_.Format = metadata.format;
+	srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc_.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	// SRVを作成するディスクリプタヒープの場所を決める
+	textureSrvHandleCPU_ = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
+	textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
+
+	// 先頭はImGuiが使っているので、その次を使う
+	textureSrvHandleCPU_.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU_.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	// SRVを生成する
+	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc_, textureSrvHandleCPU_);
+
+
 
 
 	/*-------------
@@ -318,8 +320,8 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	ImGui::CreateContext();
 	ImGui::StyleColorsDark();
 	ImGui_ImplWin32_Init(window_->GetHwnd());
-	ImGui_ImplDX12_Init(device_, swapChain_->GetSwapChainDesc().BufferCount, rtvDesc_.Format,
-		srvDescriptorHeap_,
+	ImGui_ImplDX12_Init(device_.Get(), swapChain_->GetSwapChainDesc().BufferCount, rtvDesc_.Format,
+		srvDescriptorHeap_.Get(),
 		srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart(),
 		srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart());
 }
@@ -357,7 +359,7 @@ void Engine::BeginFrame()
 	commands_->GetCommandList()->ClearRenderTargetView(rtvHandles_[backBufferIndex], clearColor, 0, nullptr);
 
 	// 描画用のDescriptorの設定
-	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_ };
+	ID3D12DescriptorHeap* descriptorHeaps[] = { srvDescriptorHeap_.Get()};
 	commands_->GetCommandList()->SetDescriptorHeaps(1, descriptorHeaps);
 }
 
@@ -367,7 +369,7 @@ void Engine::EndFrame()
 
 	ImGui::Render();
 
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commands_->GetCommandList());
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commands_->GetCommandList().Get());
 
 	// バックバッファのインデックスを取得する
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
@@ -381,7 +383,7 @@ void Engine::EndFrame()
 	assert(SUCCEEDED(hr));
 
 	// GPUにコマンドリストの実行を行わせる
-	ID3D12CommandList* commandLists[] = { commands_->GetCommandList() };
+	ID3D12CommandList* commandLists[] = { commands_->GetCommandList().Get()};
 	commands_->GetCommandQueue()->ExecuteCommandLists(1, commandLists);
 
 	// GPUとOSに画面の交換を行うように通知する
@@ -393,18 +395,16 @@ void Engine::EndFrame()
 	// 次のフレーム用のコマンドリストを準備
 	hr = commands_->GetCommandAllocator()->Reset();
 	assert(SUCCEEDED(hr));
-	hr = commands_->GetCommandList()->Reset(commands_->GetCommandAllocator(), nullptr);
+	hr = commands_->GetCommandList()->Reset(commands_->GetCommandAllocator().Get(), nullptr);
 	assert(SUCCEEDED(hr));
 
 
-	// 使用したリソースのアドレスを、リリース用アドレスで開放する
+	// 使用したリソースのアドレスを消す
 	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
 		if (resourceMemories[i])
 		{
-			ID3D12Resource* releaseResource = resourceMemories[i];
 			resourceMemories[i] = nullptr;
-			releaseResource->Release();
 		}
 	}
 }
@@ -422,28 +422,31 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 	commands_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
 
 	// PSOの設定
-	commands_->GetCommandList()->SetPipelineState(graphicsPipelineState_);
+	commands_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 
 
 	// 頂点リソースを作る
-	ID3D12Resource* vertexResource = CreateBufferResource(device_, sizeof(Vector4) * 3);
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 3);
 
 	// VBVを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vector4) * 3;
-	vertexBufferView.StrideInBytes = sizeof(Vector4);
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// データを書き込む
-	Vector4* vertexData = nullptr;
+	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	vertexData[0] = { 0.0f , 0.5f , 0.0f , 1.0f };
-	vertexData[1] = { 0.5f , -0.5f , 0.0f , 1.0f };
-	vertexData[2] = { -0.5f , -0.5f , 0.0f , 1.0f };
+	vertexData[0].position = { 0.0f , 0.5f , 0.0f , 1.0f };
+	vertexData[0].texcoord = { 0.5f , 0.0f };
+	vertexData[1].position = { 0.5f , -0.5f , 0.0f , 1.0f };
+	vertexData[0].texcoord = { 1.0f , 1.0f };
+	vertexData[2].position= { -0.5f , -0.5f , 0.0f , 1.0f };
+	vertexData[2].texcoord = { 0.0f , 1.0f };
 
 
 	// マテリアル用のリソースを作る
-	ID3D12Resource* materialResource = CreateBufferResource(device_, sizeof(Vector4));
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device_, sizeof(Vector4));
 
 	// マテリアルに書き込むデータ
 	Vector4* materialData = nullptr;
@@ -452,7 +455,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 
 
 	// 座標変換用のリソース
-	ID3D12Resource* worldViewProjectionResource = CreateBufferResource(device_, sizeof(Matrix4x4));
+	Microsoft::WRL::ComPtr<ID3D12Resource> worldViewProjectionResource = CreateBufferResource(device_, sizeof(Matrix4x4));
 
 	// ワールド行列
 	Matrix4x4 worldMatrix = Make4x4AffineMatrix(transform.scale, transform.rotate, transform.translate);

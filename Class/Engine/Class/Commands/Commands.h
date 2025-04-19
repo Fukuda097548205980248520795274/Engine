@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
@@ -17,23 +18,23 @@ public:
 	~Commands();
 
 	// 初期化
-	void Initialize(ID3D12Device* device);
+	void Initialize(Microsoft::WRL::ComPtr<ID3D12Device> device);
 
 	// Getter
-	ID3D12CommandQueue* GetCommandQueue() { return commandQueue_; }
-	ID3D12CommandAllocator* GetCommandAllocator() { return commandAllocator_; }
-	ID3D12GraphicsCommandList* GetCommandList() { return commandList_; }
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> GetCommandQueue() { return commandQueue_; }
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> GetCommandAllocator() { return commandAllocator_; }
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> GetCommandList() { return commandList_; }
 
 private:
 
 	// コマンドキュー
-	ID3D12CommandQueue* commandQueue_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue_ = nullptr;
 	D3D12_COMMAND_QUEUE_DESC commandQueueDesc_{};
 
 	// コマンドアロケータ
-	ID3D12CommandAllocator* commandAllocator_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator_ = nullptr;
 
 	// コマンドリスト
-	ID3D12GraphicsCommandList* commandList_ = nullptr;
+	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList_ = nullptr;
 };
 

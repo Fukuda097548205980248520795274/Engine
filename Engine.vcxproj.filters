@@ -73,6 +73,9 @@
     <Filter Include="Class\Engine\Func\Crash">
       <UniqueIdentifier>{4e07fd19-15b8-41b1-86c4-52ca6fe4fdbe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Func\Texture">
+      <UniqueIdentifier>{b02d23f1-585f-4897-8faa-3d41e05bdfd5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -140,6 +143,9 @@
     </ClCompile>
     <ClCompile Include="Class\Engine\Func\Crash\Crash.cpp">
       <Filter>Class\Engine\Func\Crash</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Func\Texture\Texture.cpp">
+      <Filter>Class\Engine\Func\Texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -211,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Func\Crash\Crash.h">
       <Filter>Class\Engine\Func\Crash</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Func\Texture\Texture.h">
+      <Filter>Class\Engine\Func\Texture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
