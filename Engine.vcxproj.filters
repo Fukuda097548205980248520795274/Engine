@@ -235,4 +235,9 @@
       <Filter>imgui</Filter>
     </Text>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Class\Engine\Shader\Object3D.hlsli">
+      <Filter>Class\Engine\Shader</Filter>
+    </None>
+  </ItemGroup>
 </Project>

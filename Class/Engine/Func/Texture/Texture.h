@@ -3,12 +3,16 @@
 #include <stdint.h>
 #include <string>
 #include <cassert>
+#include <vector>
 #include <wrl.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
 #include "../../externals/DirectXTex/DirectXTex.h"
+#include "../../externals/DirectXTex/d3dx12.h"
 #include "../StringInfo/StringInfo.h"
+#include "../../Func/Create/Create.h"
+#include "../../Func/TransitionBarrier/TransitionBarrier.h"
 
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -30,8 +34,13 @@ DirectX::ScratchImage LoadTexture(const std::string& filePath);
 Microsoft::WRL::ComPtr<ID3D12Resource> CreateTextureResource(Microsoft::WRL::ComPtr<ID3D12Device> device, const DirectX::TexMetadata& metadata);
 
 /// <summary>
-/// テクスチャリソースにテクスチャ情報を転送する
+/// メタデータをテクスチャに転送する
 /// </summary>
 /// <param name="texture"></param>
 /// <param name="mipImages"></param>
-void UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages);
+/// <param name="device"></param>
+/// <param name="commandList"></param>
+/// <returns></returns>
+[[nodiscard]]
+Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(Microsoft::WRL::ComPtr<ID3D12Resource> texture, const DirectX::ScratchImage& mipImages,
+	Microsoft::WRL::ComPtr<ID3D12Device> device, Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList> commandList);

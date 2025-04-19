@@ -167,10 +167,10 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	---------------*/
 
 	// テクスチャ用のリソース
-	DirectX::ScratchImage mipImages = LoadTexture("Resources/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	mipImages_ = LoadTexture("Resources/uvChecker.png");
+	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
 	textureResource_ = CreateTextureResource(device_, metadata);
-	UploadTextureData(textureResource_, mipImages);
+	intermediateResource_ = UploadTextureData(textureResource_, mipImages_, device_, commands_->GetCommandList());
 
 	// metaDataを基にSRVを作成する
 	srvDesc_.Format = metadata.format;
@@ -201,6 +201,12 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	shader_->Initialize();
 
 
+	descriptorRange_[0].BaseShaderRegister = 0;
+	descriptorRange_[0].NumDescriptors = 1;
+	descriptorRange_[0].RangeType = D3D12_DESCRIPTOR_RANGE_TYPE_SRV;
+	descriptorRange_[0].OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
+
+
 	/*   RootSignature   */
 
 	// PixelShader CBV 0
@@ -213,11 +219,34 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	rootParameters_[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX;
 	rootParameters_[1].Descriptor.ShaderRegister = 0;
 
+	// PixelShader DescriptorTable
+	rootParameters_[2].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
+	rootParameters_[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+	rootParameters_[2].DescriptorTable.pDescriptorRanges = descriptorRange_;
+	rootParameters_[2].DescriptorTable.NumDescriptorRanges = _countof(descriptorRange_);
+
+
+	// サンプラーを設定する
+	staticSamplers_[0].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	staticSamplers_[0].AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers_[0].AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers_[0].AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+	staticSamplers_[0].ComparisonFunc = D3D12_COMPARISON_FUNC_NONE;
+	staticSamplers_[0].MaxLOD = D3D12_FLOAT32_MAX;
+
+	// PixelShader s0
+	staticSamplers_[0].ShaderRegister = 0;
+	staticSamplers_[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+
+
 	// ルートシグネチャを設定する
 	descriptionRootSignature_.Flags =
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
 	descriptionRootSignature_.pParameters = rootParameters_;
 	descriptionRootSignature_.NumParameters = _countof(rootParameters_);
+	descriptionRootSignature_.pStaticSamplers = staticSamplers_;
+	descriptionRootSignature_.NumStaticSamplers = _countof(staticSamplers_);
+
 
 	// シリアライズにしてバイナリにする
 	hr = D3D12SerializeRootSignature(&descriptionRootSignature_, D3D_ROOT_SIGNATURE_VERSION_1, &signatureBlob_, &errorBlob_);
@@ -241,6 +270,12 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	inputElementDescs_[0].SemanticIndex = 0;
 	inputElementDescs_[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	inputElementDescs_[0].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
+
+	// float2 texcoord : TEXCOORD0
+	inputElementDescs_[1].SemanticName = "TEXCOORD";
+	inputElementDescs_[1].SemanticIndex = 0;
+	inputElementDescs_[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+	inputElementDescs_[1].AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT;
 
 	inputLayoutDescs_.pInputElementDescs = inputElementDescs_;
 	inputLayoutDescs_.NumElements = _countof(inputElementDescs_);
@@ -440,7 +475,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 	vertexData[0].position = { 0.0f , 0.5f , 0.0f , 1.0f };
 	vertexData[0].texcoord = { 0.5f , 0.0f };
 	vertexData[1].position = { 0.5f , -0.5f , 0.0f , 1.0f };
-	vertexData[0].texcoord = { 1.0f , 1.0f };
+	vertexData[1].texcoord = { 1.0f , 1.0f };
 	vertexData[2].position= { -0.5f , -0.5f , 0.0f , 1.0f };
 	vertexData[2].texcoord = { 0.0f , 1.0f };
 
@@ -477,6 +512,9 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 
 	// 座標変換用のCBVを設定する
 	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldViewProjectionResource->GetGPUVirtualAddress());
+
+	// テクスチャのCBVを設定する
+	commands_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU_);
 
 	// 描画する
 	commands_->GetCommandList()->DrawInstanced(3, 1, 0, 0);

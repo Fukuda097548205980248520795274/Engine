@@ -129,6 +129,9 @@ private:
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_{};
 
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_ = nullptr;
+	DirectX::ScratchImage mipImages_;
+
+	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_ = nullptr;
 
 	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_{};
 	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_{};
@@ -143,8 +146,14 @@ private:
 	// ルートシグネチャの設定
 	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
 
+	// ディスクリプタレンジ
+	D3D12_DESCRIPTOR_RANGE descriptorRange_[1] = {};
+
 	// ルートパラメータ
-	D3D12_ROOT_PARAMETER rootParameters_[2] = {};
+	D3D12_ROOT_PARAMETER rootParameters_[3] = {};
+
+	// サンプラーの設定
+	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
 
 	// バイナリデータ
 	ID3DBlob* signatureBlob_ = nullptr;
@@ -154,7 +163,7 @@ private:
 	ID3D12RootSignature* rootSignature_ = nullptr;
 
 	// 頂点シェーダのどの変数にinputするかを選ぶ
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[1] = {};
+	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[2] = {};
 
 	// 頂点シェーダにinputするデータ
 	D3D12_INPUT_LAYOUT_DESC inputLayoutDescs_{};

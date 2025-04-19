@@ -11,7 +11,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		{1.0f , 1.0f , 1.0f},
 		{0.0f , 0.0f ,0.0f},
-		{0.0f , 0.0f , -20.0f}
+		{0.0f , 0.0f , -5.0f}
 	};
 
 	// 三角形
@@ -50,7 +50,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 描画処理ここから
 		/// 
 
-		engine->DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), 1.0f, 0.0f, 0.0f, 1.0f);
+		engine->DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), 1.0f, 1.0f, 1.0f, 1.0f);
 
 		///
 		/// ↑ 描画処理ここまで
