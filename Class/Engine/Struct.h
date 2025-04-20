@@ -68,9 +68,49 @@
 	// 頂点データ
 	typedef struct VertexData
 	{
+		// 位置
 		Vector4 position;
+
+		// テクスチャ座標
 		Vector2 texcoord;
+
+		// 法線
+		Vector3 normal;
+
 	}VertexData;
+
+	// マテリアル
+	typedef struct Material
+	{
+		// 色
+		Vector4 color;
+
+		// ライティングを有効にするかどうか
+		int32_t enableLighting;
+	}Material;
+
+	// 座標変換用行列
+	typedef struct TransformationMatrix
+	{
+		// ワールドビュープロジェクション行列
+		Matrix4x4 worldViewProjection;
+
+		// ワールド行列
+		Matrix4x4 world;
+	}TransformationMatrix;
+
+	// 平行光源
+	typedef struct DirectionalLight
+	{
+		// ライトの色
+		Vector4 color;
+
+		// ライトの向き
+		Vector3 direction;
+
+		// 輝度
+		float intensity;
+	}DirectionalLight;
 
 	// リソースリークチェッカー
 	typedef struct D3DResourceLeakChecker

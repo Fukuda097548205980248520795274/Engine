@@ -58,15 +58,16 @@ public:
 	uint32_t LoadTexture(const std::string& filePath);
 
 	// 三角形を描画する
-	void DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewProjectionMatrix,
-		float red, float green, float blue, float alpha, uint32_t textureHandle);
+	void DrawTriangle(struct Transform3D& transform, const DirectionalLight& light,
+		const Matrix4x4& viewProjectionMatrix,uint32_t textureHandle);
 
 	// スプライトを描画する
 	void DrawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-		const Transform3D& transform, const Matrix4x4& viewProjectionMatrixuint32_t, uint32_t textureHandle);
+		const Transform3D& transform, const Matrix4x4& viewOrthograhpicsMatrix,uint32_t textureHandle);
 
 	// 球を描画する
-	void DrawSphere(uint32_t subdivisions,const Transform3D& transform, const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle);
+	void DrawSphere(uint32_t subdivisions,const Transform3D& transform, const Matrix4x4& viewProjectionMatrix,
+		const DirectionalLight& light, uint32_t textureHandle);
 
 
 private:
@@ -127,8 +128,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> swapChainResource_[2] = { nullptr };
 
 
-	// RTVの設定
-	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc_{};
 	
 	// RTVディスクリプタ と スワップチェーンのリソース を紐づける
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandles_[2];
@@ -137,17 +136,14 @@ private:
 	// デプスステンシルのリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> depthStencilResource_ = nullptr;
 
-	// DSVの設定
-	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc_{};
-
 
 	// フェンス
 	Fence* fence_;
 
 
 	// リソースを保存する場所
-	const uint32_t kNumResourceMemories = 256;
-	Microsoft::WRL::ComPtr<ID3D12Resource> resourceMemories[256] = { nullptr };
+	const uint32_t kNumResourceMemories = 1024;
+	Microsoft::WRL::ComPtr<ID3D12Resource> resourceMemories[1024] = { nullptr };
 
 
 
@@ -161,18 +157,6 @@ private:
 	// シェーダー
 	Shader* shader_;
 
-	// ルートシグネチャの設定
-	D3D12_ROOT_SIGNATURE_DESC descriptionRootSignature_{};
-
-	// ディスクリプタレンジ
-	D3D12_DESCRIPTOR_RANGE descriptorRange_[1] = {};
-
-	// ルートパラメータ
-	D3D12_ROOT_PARAMETER rootParameters_[3] = {};
-
-	// サンプラーの設定
-	D3D12_STATIC_SAMPLER_DESC staticSamplers_[1] = {};
-
 	// バイナリデータ
 	ID3DBlob* signatureBlob_ = nullptr;
 	ID3DBlob* errorBlob_ = nullptr;
@@ -180,29 +164,11 @@ private:
 	// ルートシグネチャ
 	ID3D12RootSignature* rootSignature_ = nullptr;
 
-	// 頂点シェーダのどの変数にinputするかを選ぶ
-	D3D12_INPUT_ELEMENT_DESC inputElementDescs_[2] = {};
-
-	// 頂点シェーダにinputするデータ
-	D3D12_INPUT_LAYOUT_DESC inputLayoutDescs_{};
-
-	// ピクセルシェーダの出力の設定
-	D3D12_BLEND_DESC blendDesc_{};
-
-	// ラスタライザの設定
-	D3D12_RASTERIZER_DESC rasterizeDesc_{};
-
-	// デプスステンシルの設定
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc_{};
-
 	// 頂点シェーダのバイナリデータ
 	IDxcBlob* vertexShaderBlob_ = nullptr;
 
 	// ピクセルシェーダーのバイナリデータ
 	IDxcBlob* pixelShaderBlob_ = nullptr;
-
-	// PSOの設定
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC graphicsPipelineStateDesc_{};
 
 	// PSO
 	Microsoft::WRL::ComPtr<ID3D12PipelineState> graphicsPipelineState_ = nullptr;

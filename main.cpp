@@ -14,8 +14,24 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{0.0f , 0.0f , -10.0f}
 	};
 
+	// 光源
+	DirectionalLight light
+	{
+		{0.0f , 0.0f , 1.0f , 1.0f},
+		{0.0f , -1.0f , 0.0f},
+		1.0f
+	};
+
 	// スプライト
 	Transform3D sprite
+	{
+		{1.0f , 1.0f , 1.0f},
+		{0.0f , 0.0f , 0.0f},
+		{0.0f , 0.0f , 0.0f}
+	};
+
+	// 三角形
+	Transform3D triangle
 	{
 		{1.0f , 1.0f , 1.0f},
 		{0.0f , 0.0f , 0.0f},
@@ -35,6 +51,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	uint32_t ghUvChecker = engine->LoadTexture("Resources/uvChecker.png");
 	uint32_t ghMonsterBall = engine->LoadTexture("Resources/monsterBall.png");
+	uint32_t ghWhite = engine->LoadTexture("Resources/white.png");
 
 
 	// メインループ
@@ -49,6 +66,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		ImGui::Begin("Triangle");
 		ImGui::DragFloat3("cmaera Translate", &cameraTransform.translate.x , 0.01f);
+		ImGui::DragFloat3("light normal", &light.direction.x, 0.01f);
 		ImGui::DragFloat3("sphere scale", &sphere.scale.x, 0.01f);
 		ImGui::DragFloat3("sphere rotate", &sphere.rotate.x, 0.01f);
 		ImGui::DragFloat3("sphere translate", &sphere.translate.x, 0.01f);
@@ -68,7 +86,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 描画処理ここから
 		/// 
 		
-		engine->DrawSphere(subdivisions, sphere, Multiply(viewMatrix, projectionMatrix),ghMonsterBall);
+		engine->DrawSphere(subdivisions, sphere, Multiply(viewMatrix, projectionMatrix),light, ghMonsterBall);
+		engine->DrawTriangle(triangle, light, Multiply(viewMatrix, projectionMatrix), ghWhite);
 		engine->DrawSprite(0.0f, 0.0f, 320.0f, 0.0f, 0.0f, 180.0f, 320.0f, 180.0f, sprite, Multiply(viewMatrix, orthoMatrix), ghUvChecker);
 
 		///
