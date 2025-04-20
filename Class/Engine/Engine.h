@@ -1,5 +1,7 @@
 #pragma once
 #include <Windows.h>
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <wrl.h>
 #include <stdint.h>
 #include <string>
@@ -20,6 +22,7 @@
 #include "Class/SwapChain/SwapChain.h"
 #include "Class/Fence/Fence.h"
 #include "Class/Shader/Shader.h"
+#include "Class/TextureManager/TextureManager.h"
 #include "Func/StringInfo/StringInfo.h"
 #include "Func/Matrix/Matrix.h"
 #include "Func/Create/Create.h"
@@ -51,17 +54,19 @@ public:
 	// フレーム終了
 	void EndFrame();
 
+	// テクスチャを読み込む
+	uint32_t LoadTexture(const std::string& filePath);
+
 	// 三角形を描画する
 	void DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewProjectionMatrix,
-		float red, float green, float blue, float alpha);
+		float red, float green, float blue, float alpha, uint32_t textureHandle);
 
 	// スプライトを描画する
 	void DrawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-		const Transform3D& transform, const Matrix4x4& viewProjectionMatrix);
+		const Transform3D& transform, const Matrix4x4& viewProjectionMatrixuint32_t, uint32_t textureHandle);
 
 	// 球を描画する
-	void DrawSphere(float x, float y, float z, float radiusX, float radiusY, float radiusZ,
-		uint32_t latSubdivisions, uint32_t lonSubdivisions, const Matrix4x4& viewProjectionMatrix);
+	void DrawSphere(uint32_t subdivisions,const Transform3D& transform, const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle);
 
 
 private:
@@ -146,17 +151,8 @@ private:
 
 
 
-	/*   テクスチャ   */
-
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc_{};
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource_ = nullptr;
-	DirectX::ScratchImage mipImages_;
-
-	Microsoft::WRL::ComPtr<ID3D12Resource> intermediateResource_ = nullptr;
-
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU_{};
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU_{};
+	// テクスチャマネージャ
+	TextureManager* textureManager_;
 
 
 

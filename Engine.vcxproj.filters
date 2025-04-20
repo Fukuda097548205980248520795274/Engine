@@ -76,6 +76,9 @@
     <Filter Include="Class\Engine\Func\Texture">
       <UniqueIdentifier>{b02d23f1-585f-4897-8faa-3d41e05bdfd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Class\TextureManager">
+      <UniqueIdentifier>{b25f08be-7709-4c18-967a-9a9698394a0b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -146,6 +149,9 @@
     </ClCompile>
     <ClCompile Include="Class\Engine\Func\Texture\Texture.cpp">
       <Filter>Class\Engine\Func\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\TextureManager\TextureManager.cpp">
+      <Filter>Class\Engine\Class\TextureManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Func\Texture\Texture.h">
       <Filter>Class\Engine\Func\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\TextureManager\TextureManager.h">
+      <Filter>Class\Engine\Class\TextureManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

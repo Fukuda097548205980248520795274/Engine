@@ -19,6 +19,9 @@ Engine::~Engine()
 	// シェーダー
 	delete shader_;
 
+	// テクスチャマネージャ
+	delete textureManager_;
+
 	// フェンス
 	delete fence_;
 
@@ -165,32 +168,11 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	fence_->Initialize(device_);
 
 
-	/*---------------
-	    テクスチャ
-	---------------*/
+	
+	// テクスチャマネージャの初期化と生成
+	textureManager_ = new TextureManager();
+	textureManager_->Initialize();
 
-	// テクスチャ用のリソース
-	mipImages_ = LoadTexture("Resources/uvChecker.png");
-	const DirectX::TexMetadata& metadata = mipImages_.GetMetadata();
-	textureResource_ = CreateTextureResource(device_, metadata);
-	intermediateResource_ = UploadTextureData(textureResource_, mipImages_, device_, commands_->GetCommandList());
-
-	// metaDataを基にSRVを作成する
-	srvDesc_.Format = metadata.format;
-	srvDesc_.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc_.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-	srvDesc_.Texture2D.MipLevels = UINT(metadata.mipLevels);
-
-	// SRVを作成するディスクリプタヒープの場所を決める
-	textureSrvHandleCPU_ = srvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-	textureSrvHandleGPU_ = srvDescriptorHeap_->GetGPUDescriptorHandleForHeapStart();
-
-	// 先頭はImGuiが使っているので、その次を使う
-	textureSrvHandleCPU_.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleGPU_.ptr += device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	// SRVを生成する
-	device_->CreateShaderResourceView(textureResource_.Get(), &srvDesc_, textureSrvHandleCPU_);
 
 
 	/*------------------
@@ -477,8 +459,15 @@ void Engine::EndFrame()
 	}
 }
 
+// テクスチャを読み込む
+uint32_t Engine::LoadTexture(const std::string& filePath)
+{
+	return textureManager_->LoadTextureGetNumber(filePath, device_, srvDescriptorHeap_, commands_->GetCommandList());
+}
+
 // 三角形を描画する
-void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewProjectionMatrix, float red, float green, float blue, float alpha)
+void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewProjectionMatrix, 
+	float red, float green, float blue, float alpha, uint32_t textureHandle)
 {
 	// ビューポートの設定
 	commands_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -547,7 +536,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldViewProjectionResource->GetGPUVirtualAddress());
 
 	// テクスチャのCBVを設定する
-	commands_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU_);
+	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
 
 	// 描画する
 	commands_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
@@ -588,7 +577,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const Matrix4x4& viewPr
 
 // スプライトを描画する
 void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
-	const Transform3D& transform, const Matrix4x4& viewProjectionMatrix)
+	const Transform3D& transform, const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle)
 {
 	// ビューポートの設定
 	commands_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -603,13 +592,30 @@ void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float 
 	commands_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 
 
+	// インデックスリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = CreateBufferResource(device_, sizeof(uint32_t) * 6);
+
+	// IBVを作成する
+	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
+	indexBufferView.SizeInBytes = sizeof(uint32_t) * 6;
+	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+	// データを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+	indexData[0] = 0; indexData[1] = 1; indexData[2] = 2;
+	indexData[3] = 1; indexData[4] = 3; indexData[5] = 2;
+
+
+
 	// 頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 6);
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 4);
 
 	// VBVを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 4;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// データを書き込む
@@ -621,12 +627,8 @@ void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float 
 	vertexData[1].texcoord = { 0.0f , 0.0f };
 	vertexData[2].position = { x4 , y4 , 0.0f , 1.0f };
 	vertexData[2].texcoord = { 1.0f , 1.0f };
-	vertexData[3].position = { x1 , y1 , 0.0f , 1.0f };
-	vertexData[3].texcoord = { 0.0f , 0.0f };
-	vertexData[4].position = { x2 , y2 , 0.0f , 1.0f };
-	vertexData[4].texcoord = { 1.0f , 0.0f };
-	vertexData[5].position = { x4 , y4 , 0.0f , 1.0f };
-	vertexData[5].texcoord = { 1.0f , 1.0f };
+	vertexData[3].position = { x2 , y2 , 0.0f , 1.0f };
+	vertexData[3].texcoord = { 1.0f , 0.0f };
 
 
 	// 座標変換用のリソース
@@ -641,6 +643,9 @@ void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float 
 	*worldViewProjectionData = Multiply(worldMatrix, viewProjectionMatrix);
 
 
+	// IBVを設定する
+	commands_->GetCommandList()->IASetIndexBuffer(&indexBufferView);
+
 	// VBVを設定する
 	commands_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
@@ -651,15 +656,24 @@ void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float 
 	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldViewProjectionResource->GetGPUVirtualAddress());
 
 	// テクスチャのCBVを設定する
-	commands_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU_);
+	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
 
 	// 描画する
-	commands_->GetCommandList()->DrawInstanced(6, 1, 0, 0);
+	commands_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
 
 	/*--------------------------------------
 		使用していないリソースメモリに記録する
 	--------------------------------------*/
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
+	{
+		if (resourceMemories[i] == nullptr)
+		{
+			resourceMemories[i] = indexResource;
+			break;
+		}
+	}
 
 	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{
@@ -681,8 +695,7 @@ void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float 
 }
 
 // 球を描画する
-void Engine::DrawSphere(float x, float y, float z, float radiusX, float radiusY, float radiusZ,
-	uint32_t latSubdivisions, uint32_t lonSubdivisions, const Matrix4x4& viewProjectionMatrix)
+void Engine::DrawSphere(uint32_t subdivisions,const Transform3D& transform, const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle)
 {
 	// ビューポートの設定
 	commands_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -697,13 +710,46 @@ void Engine::DrawSphere(float x, float y, float z, float radiusX, float radiusY,
 	commands_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 
 
+	// インデックスリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> indexResource = CreateBufferResource(device_, sizeof(uint32_t) * (subdivisions * subdivisions * 6));
+
+	// IBVを作成する
+	D3D12_INDEX_BUFFER_VIEW indexBufferView{};
+	indexBufferView.BufferLocation = indexResource->GetGPUVirtualAddress();
+	indexBufferView.SizeInBytes = sizeof(uint32_t) * (subdivisions * subdivisions * 6);
+	indexBufferView.Format = DXGI_FORMAT_R32_UINT;
+
+	// データを書き込む
+	uint32_t* indexData = nullptr;
+	indexResource->Map(0, nullptr, reinterpret_cast<void**>(&indexData));
+
+	for (uint32_t latIndex = 0; latIndex < subdivisions; ++latIndex)
+	{
+		for (uint32_t lonIndex = 0; lonIndex < subdivisions; ++lonIndex)
+		{
+			// 要素数
+			uint32_t index = (latIndex * subdivisions + lonIndex) * 6;
+
+			// 頂点の要素数
+			uint32_t vertexIndex = (latIndex * subdivisions + lonIndex) * 4;
+
+			indexData[index + 0] = vertexIndex + 0;
+			indexData[index + 1] = vertexIndex + 1;
+			indexData[index + 2] = vertexIndex + 2;
+			indexData[index + 3] = vertexIndex + 2;
+			indexData[index + 4] = vertexIndex + 1;
+			indexData[index + 5] = vertexIndex + 3;
+		}
+	}
+
+
 	// 頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * (latSubdivisions * lonSubdivisions * 6));
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * (subdivisions * subdivisions * 4));
 
 	// VBVを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * (latSubdivisions * lonSubdivisions * 6);
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * (subdivisions * subdivisions * 4);
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// データを書き込む
@@ -711,67 +757,53 @@ void Engine::DrawSphere(float x, float y, float z, float radiusX, float radiusY,
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	
 	// 経度分割1つ分の角度φ
-	const float kLonEvery = float(M_PI) * 2.0f / static_cast<float>(lonSubdivisions);
+	const float kLonEvery = float(M_PI) * 2.0f / static_cast<float>(subdivisions);
 
 	// 緯度分割1つ分の角度Θ
-	const float kLatEvery = float(M_PI) / static_cast<float>(latSubdivisions);
+	const float kLatEvery = float(M_PI) / static_cast<float>(subdivisions);
 
 	// 緯度の方向に分割
-	for (uint32_t latIndex = 0; latIndex < latSubdivisions; ++latIndex)
+	for (uint32_t latIndex = 0; latIndex < subdivisions; ++latIndex)
 	{
 		// 現在の緯度
 		float lat = -float(M_PI) / 2.0f + kLatEvery * latIndex;
 
 		// 経度の方向に分割
-		for (uint32_t lonIndex = 0; lonIndex < lonSubdivisions; ++lonIndex)
+		for (uint32_t lonIndex = 0; lonIndex < subdivisions; ++lonIndex)
 		{
 			// 現在の経度
 			float lon = lonIndex * kLonEvery;
 
 			// 要素数
-			uint32_t index = (latIndex * latSubdivisions + lonIndex) * 6;
+			uint32_t index = (latIndex * subdivisions + lonIndex) * 4;
 
-			vertexData[index].position.x = radiusX * std::cos(lat) * std::cos(lon);
-			vertexData[index].position.y = radiusY * std::sin(lat);
-			vertexData[index].position.z = radiusZ * std::cos(lat) * std::sin(lon);
+			vertexData[index].position.x = std::cos(lat) * std::cos(lon);
+			vertexData[index].position.y = std::sin(lat);
+			vertexData[index].position.z = std::cos(lat) * std::sin(lon);
 			vertexData[index].position.w = 1.0f;
-			vertexData[index].texcoord.x = static_cast<float>(lonIndex) / static_cast<float>(lonSubdivisions);
-			vertexData[index].texcoord.y = 1.0f - static_cast<float>(latIndex) / static_cast<float>(latSubdivisions);
+			vertexData[index].texcoord.x = static_cast<float>(lonIndex) / static_cast<float>(subdivisions);
+			vertexData[index].texcoord.y = 1.0f - static_cast<float>(latIndex) / static_cast<float>(subdivisions);
 
-			vertexData[index + 1].position.x = radiusX * std::cos(lat + kLatEvery) * std::cos(lon);
-			vertexData[index + 1].position.y = radiusY * std::sin(lat + kLatEvery);
-			vertexData[index + 1].position.z = radiusZ * std::cos(lat + kLatEvery) * std::sin(lon);
+			vertexData[index + 1].position.x = std::cos(lat + kLatEvery) * std::cos(lon);
+			vertexData[index + 1].position.y = std::sin(lat + kLatEvery);
+			vertexData[index + 1].position.z = std::cos(lat + kLatEvery) * std::sin(lon);
 			vertexData[index + 1].position.w = 1.0f;
-			vertexData[index + 1].texcoord.x = static_cast<float>(lonIndex) / static_cast<float>(lonSubdivisions);
-			vertexData[index + 1].texcoord.y = 1.0f - static_cast<float>(latIndex + 1) / static_cast<float>(latSubdivisions);
+			vertexData[index + 1].texcoord.x = static_cast<float>(lonIndex) / static_cast<float>(subdivisions);
+			vertexData[index + 1].texcoord.y = 1.0f - static_cast<float>(latIndex + 1) / static_cast<float>(subdivisions);
 
-			vertexData[index + 2].position.x = radiusX * std::cos(lat) * std::cos(lon + kLonEvery);
-			vertexData[index + 2].position.y = radiusY * std::sin(lat);
-			vertexData[index + 2].position.z = radiusZ * std::cos(lat) * std::sin(lon + kLonEvery);
+			vertexData[index + 2].position.x = std::cos(lat) * std::cos(lon + kLonEvery);
+			vertexData[index + 2].position.y = std::sin(lat);
+			vertexData[index + 2].position.z = std::cos(lat) * std::sin(lon + kLonEvery);
 			vertexData[index + 2].position.w = 1.0f;
-			vertexData[index + 2].texcoord.x = static_cast<float>(lonIndex + 1) / static_cast<float>(lonSubdivisions);
-			vertexData[index + 2].texcoord.y = 1.0f - static_cast<float>(latIndex) / static_cast<float>(latSubdivisions);
+			vertexData[index + 2].texcoord.x = static_cast<float>(lonIndex + 1) / static_cast<float>(subdivisions);
+			vertexData[index + 2].texcoord.y = 1.0f - static_cast<float>(latIndex) / static_cast<float>(subdivisions);
 
-			vertexData[index + 3].position.x = radiusX * std::cos(lat) * std::cos(lon + kLonEvery);
-			vertexData[index + 3].position.y = radiusY * std::sin(lat);
-			vertexData[index + 3].position.z = radiusZ * std::cos(lat) * std::sin(lon + kLonEvery);
+			vertexData[index + 3].position.x = std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery);
+			vertexData[index + 3].position.y = std::sin(lat + kLatEvery);
+			vertexData[index + 3].position.z = std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery);
 			vertexData[index + 3].position.w = 1.0f;
-			vertexData[index + 3].texcoord.x = static_cast<float>(lonIndex + 1) / static_cast<float>(lonSubdivisions);
-			vertexData[index + 3].texcoord.y = 1.0f - static_cast<float>(latIndex) / static_cast<float>(latSubdivisions);
-
-			vertexData[index + 4].position.x = radiusX * std::cos(lat + kLatEvery) * std::cos(lon);
-			vertexData[index + 4].position.y = radiusY * std::sin(lat + kLatEvery);
-			vertexData[index + 4].position.z = radiusZ * std::cos(lat + kLatEvery) * std::sin(lon);
-			vertexData[index + 4].position.w = 1.0f;
-			vertexData[index + 4].texcoord.x = static_cast<float>(lonIndex) / static_cast<float>(lonSubdivisions);
-			vertexData[index + 4].texcoord.y = 1.0f - static_cast<float>(latIndex + 1) / static_cast<float>(latSubdivisions);
-
-			vertexData[index + 5].position.x = radiusX * std::cos(lat + kLatEvery) * std::cos(lon + kLonEvery);
-			vertexData[index + 5].position.y = radiusY * std::sin(lat + kLatEvery);
-			vertexData[index + 5].position.z = radiusZ * std::cos(lat + kLatEvery) * std::sin(lon + kLonEvery);
-			vertexData[index + 5].position.w = 1.0f;
-			vertexData[index + 5].texcoord.x = static_cast<float>(lonIndex + 1) / static_cast<float>(lonSubdivisions);
-			vertexData[index + 5].texcoord.y = 1.0f - static_cast<float>(latIndex + 1) / static_cast<float>(latSubdivisions);
+			vertexData[index + 3].texcoord.x = static_cast<float>(lonIndex + 1) / static_cast<float>(subdivisions);
+			vertexData[index + 3].texcoord.y = 1.0f - static_cast<float>(latIndex + 1) / static_cast<float>(subdivisions);
 		}
 	}
 
@@ -789,13 +821,16 @@ void Engine::DrawSphere(float x, float y, float z, float radiusX, float radiusY,
 	Microsoft::WRL::ComPtr<ID3D12Resource> worldViewProjectionResource = CreateBufferResource(device_, sizeof(Matrix4x4));
 
 	// ワールド行列
-	Matrix4x4 worldMatrix = Make4x4AffineMatrix({1.0f , 1.0f , 1.0f}, {0.0f , 0.0f , 0.0f}, {x,y,z});
+	Matrix4x4 worldMatrix = Make4x4AffineMatrix(transform.scale, transform.rotate, transform.translate);
 
 	// 行列に書き込む
 	Matrix4x4* worldViewProjectionData = nullptr;
 	worldViewProjectionResource->Map(0, nullptr, reinterpret_cast<void**>(&worldViewProjectionData));
 	*worldViewProjectionData = Multiply(worldMatrix, viewProjectionMatrix);
 
+
+	// IBVを設定する
+	commands_->GetCommandList()->IASetIndexBuffer(&indexBufferView);
 
 	// VBVを設定する
 	commands_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
@@ -810,15 +845,24 @@ void Engine::DrawSphere(float x, float y, float z, float radiusX, float radiusY,
 	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(1, worldViewProjectionResource->GetGPUVirtualAddress());
 
 	// テクスチャのCBVを設定する
-	commands_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU_);
+	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
 
 	// 描画する
-	commands_->GetCommandList()->DrawInstanced(latSubdivisions * lonSubdivisions * 6, 1, 0, 0);
+	commands_->GetCommandList()->DrawIndexedInstanced(subdivisions * subdivisions * 6, 1, 0, 0 , 0);
 
 
 	/*--------------------------------------
 		使用していないリソースメモリに記録する
 	--------------------------------------*/
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
+	{
+		if (resourceMemories[i] == nullptr)
+		{
+			resourceMemories[i] = indexResource;
+			break;
+		}
+	}
 
 	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{

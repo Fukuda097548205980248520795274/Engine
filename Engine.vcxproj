@@ -95,6 +95,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Class\Engine\Class\Fence\Fence.cpp" />
     <ClCompile Include="Class\Engine\Class\Shader\Shader.cpp" />
     <ClCompile Include="Class\Engine\Class\SwapChain\SwapChain.cpp" />
+    <ClCompile Include="Class\Engine\Class\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Class\Engine\Class\Window\Window.cpp" />
     <ClCompile Include="Class\Engine\Engine.cpp" />
     <ClCompile Include="Class\Engine\externals\imgui\imgui.cpp" />
@@ -120,6 +121,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Class\Engine\Class\Fence\Fence.h" />
     <ClInclude Include="Class\Engine\Class\Shader\Shader.h" />
     <ClInclude Include="Class\Engine\Class\SwapChain\SwapChain.h" />
+    <ClInclude Include="Class\Engine\Class\TextureManager\TextureManager.h" />
     <ClInclude Include="Class\Engine\Class\Window\Window.h" />
     <ClInclude Include="Class\Engine\Engine.h" />
     <ClInclude Include="Class\Engine\externals\imgui\imconfig.h" />

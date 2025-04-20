@@ -11,11 +11,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	{
 		{1.0f , 1.0f , 1.0f},
 		{0.0f , 0.0f ,0.0f},
-		{0.0f , 0.0f , -20.0f}
+		{0.0f , 0.0f , -10.0f}
 	};
 
-	// 位置
-	Vector3 pos = { 0.0f , 0.0f , 0.0f };
+	// スプライト
+	Transform3D sprite
+	{
+		{1.0f , 1.0f , 1.0f},
+		{0.0f , 0.0f , 0.0f},
+		{0.0f , 0.0f , 0.0f}
+	};
+
+	// 球
+	Transform3D sphere
+	{
+		{1.0f , 1.0f , 1.0f},
+		{0.0f , 0.0f , 0.0f},
+		{0.0f , 0.0f , 0.0f}
+	};
+
+	// 分割数
+	int subdivisions = 24;
+
+	uint32_t ghUvChecker = engine->LoadTexture("Resources/uvChecker.png");
+	uint32_t ghMonsterBall = engine->LoadTexture("Resources/monsterBall.png");
+
 
 	// メインループ
 	while(engine->IsWindowOpen())
@@ -29,7 +49,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		ImGui::Begin("Triangle");
 		ImGui::DragFloat3("cmaera Translate", &cameraTransform.translate.x , 0.01f);
-		ImGui::DragFloat3("pos", &pos.x, 0.01f);
+		ImGui::DragFloat3("sphere scale", &sphere.scale.x, 0.01f);
+		ImGui::DragFloat3("sphere rotate", &sphere.rotate.x, 0.01f);
+		ImGui::DragFloat3("sphere translate", &sphere.translate.x, 0.01f);
+		ImGui::DragInt("lat", &subdivisions, 1.0f, 6, 24);
 		ImGui::End();
 
 
@@ -44,8 +67,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		/// ↓ 描画処理ここから
 		/// 
-
-		engine->DrawSphere(pos.x, pos.y, pos.z, 1.0f, 1.0f, 1.0f, 24, 24 , Multiply(viewMatrix,projectionMatrix));
+		
+		engine->DrawSphere(subdivisions, sphere, Multiply(viewMatrix, projectionMatrix),ghMonsterBall);
+		engine->DrawSprite(0.0f, 0.0f, 320.0f, 0.0f, 0.0f, 180.0f, 320.0f, 180.0f, sprite, Multiply(viewMatrix, orthoMatrix), ghUvChecker);
 
 		///
 		/// ↑ 描画処理ここまで
