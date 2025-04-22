@@ -19,6 +19,9 @@ Engine::~Engine()
 	// シェーダー
 	delete shader_;
 
+	// サウンド
+	delete sound_;
+
 	// テクスチャマネージャ
 	delete textureManager_;
 
@@ -44,6 +47,9 @@ Engine::~Engine()
 // 初期化
 void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight)
 {
+	/*-------------------------
+	    ログファイルを書き出す
+	-------------------------*/
 
 	// ログのディレクトリを用意する
 	std::filesystem::create_directory("Class/Engine/Logs");
@@ -72,7 +78,9 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	// COMの初期化
 	CoInitializeEx(0, COINIT_MULTITHREADED);
 
+	// miniDump
 	SetUnhandledExceptionFilter(ExportDump);
+
 
 	// ウィンドウの生成と初期化
 	window_ = new Window();
@@ -175,6 +183,10 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	// テクスチャマネージャの初期化と生成
 	textureManager_ = new TextureManager();
 	textureManager_->Initialize();
+
+	// サウンドの初期化と生成
+	sound_ = new Sound();
+	sound_->Initialize();
 
 
 
@@ -308,12 +320,24 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 
 	/*   BlendState   */
 
+	/*
+
+	// レンダーターゲットのブレンド設定
+	D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
+	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+	blenddesc.BlendEnable = true;
+	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+
+	*/
+
 	// ピクセルシェーダの出力の設定
 	D3D12_BLEND_DESC blendDesc{};
-
-	// 全ての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask =
-		D3D12_COLOR_WRITE_ENABLE_ALL;
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 
 	/*   RasterizeState   */
@@ -503,6 +527,18 @@ uint32_t Engine::LoadTexture(const std::string& filePath)
 	return textureManager_->LoadTextureGetNumber(filePath, device_, srvDescriptorHeap_, commands_->GetCommandList());
 }
 
+// サウンドデータを読み込む
+uint32_t Engine::LoadSound(const char* fileName)
+{
+	return sound_->LoadSoundGetNumber(fileName);
+}
+
+// サウンドデータを再生する
+void Engine::PlayerSoundWav(uint32_t soundHandle)
+{
+	sound_->SelectNumberPlaySoundWav(soundHandle);
+}
+
 // 三角形を描画する
 void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight& light,
 	const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle)
@@ -549,8 +585,13 @@ void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight&
 	// マテリアルに書き込むデータ
 	Material* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+	Transform3D uvTransform = { {1.0f , 1.0f , 1.0f} , {0.0f , 0.0f , 0.0f} , {0.0f , 0.0f , 0.0f} };
+
 	materialData->color = {1.0f , 1.0f , 1.0f , 1.0f};
-	materialData->enableLighting = true;
+	materialData->enableLighting = false;
+	materialData->uvTransform = Multiply(Multiply(Make4x4ScaleMatrix(uvTransform.scale),
+		Make4x4RotateZMatrix(uvTransform.rotate.z)), Make4x4TranslateMatrix(uvTransform.translate));
 
 
 	// 座標変換用のリソース
@@ -707,8 +748,13 @@ void Engine::DrawSprite(float x1, float y1, float x2, float y2, float x3, float 
 	// データを書き込む
 	Material* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+	Transform3D uvTransform = { {1.0f , 1.0f , 1.0f} , {0.0f , 0.0f , 0.0f} , {0.0f , 0.0f , 0.0f} };
+
 	materialData->color = { 1.0f , 1.0f , 1.0f , 1.0f };
 	materialData->enableLighting = false;
+	materialData->uvTransform = Multiply(Multiply(Make4x4ScaleMatrix(uvTransform.scale),
+		Make4x4RotateZMatrix(uvTransform.rotate.z)), Make4x4TranslateMatrix(uvTransform.translate));
 
 
 	// 座標変換用のリソース
@@ -917,8 +963,13 @@ void Engine::DrawSphere(uint32_t subdivisions,const Transform3D& transform, cons
 	// マテリアルに書き込むデータ
 	Material* materialData = nullptr;
 	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+	Transform3D uvTransform = { {1.0f , 1.0f , 1.0f} , {0.0f , 0.0f , 0.0f} , {0.0f , 0.0f , 0.0f} };
+
 	materialData->color = { 1.0f , 1.0f , 1.0f , 1.0f };
 	materialData->enableLighting = true;
+	materialData->uvTransform = Multiply(Multiply(Make4x4ScaleMatrix(uvTransform.scale),
+		Make4x4RotateZMatrix(uvTransform.rotate.z)), Make4x4TranslateMatrix(uvTransform.translate));
 
 
 	// 座標変換用のリソース
@@ -979,6 +1030,142 @@ void Engine::DrawSphere(uint32_t subdivisions,const Transform3D& transform, cons
 			break;
 		}
 	}
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
+	{
+		if (resourceMemories[i] == nullptr)
+		{
+			resourceMemories[i] = vertexResource;
+			break;
+		}
+	}
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
+	{
+		if (resourceMemories[i] == nullptr)
+		{
+			resourceMemories[i] = materialResource;
+			break;
+		}
+	}
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
+	{
+		if (resourceMemories[i] == nullptr)
+		{
+			resourceMemories[i] = transformationMatrixResource;
+			break;
+		}
+	}
+
+	for (uint32_t i = 0; i < kNumResourceMemories; i++)
+	{
+		if (resourceMemories[i] == nullptr)
+		{
+			resourceMemories[i] = directionalLightResource;
+			break;
+		}
+	}
+}
+
+// モデルを描画する
+void Engine::DrawModel(const std::string& directoryPath, const std::string& filename,
+	Transform3D& transform, const Matrix4x4& viewProjectionMatrix, const DirectionalLight& light , uint32_t textureHandle)
+{
+	// ビューポートの設定
+	commands_->GetCommandList()->RSSetViewports(1, &viewport_);
+
+	// シザーの設定
+	commands_->GetCommandList()->RSSetScissorRects(1, &scissorRect_);
+
+	// rootSignature
+	commands_->GetCommandList()->SetGraphicsRootSignature(rootSignature_);
+
+	// PSOの設定
+	commands_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
+
+
+	// モデルデータ読み込み
+	ModelData modelData = LoadObjFile(directoryPath, filename);
+
+	// 頂点リソースを作成する
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, UINT(sizeof(VertexData) * modelData.vertices.size()));
+	
+	// VBVを設定する
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
+	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
+	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
+	vertexBufferView.StrideInBytes = sizeof(VertexData);
+
+	// 頂点リソースにデータを書き込む
+	VertexData* vertexData = nullptr;
+	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
+	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+	
+
+
+	// マテリアル用のリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource = CreateBufferResource(device_, sizeof(Material));
+
+	// マテリアルに書き込むデータ
+	Material* materialData = nullptr;
+	materialResource->Map(0, nullptr, reinterpret_cast<void**>(&materialData));
+
+	Transform3D uvTransform = { {1.0f , 1.0f , 1.0f} , {0.0f , 0.0f , 0.0f} , {0.0f , 0.0f , 0.0f} };
+
+	materialData->color = { 1.0f , 1.0f , 1.0f , 1.0f };
+	materialData->enableLighting = true;
+	materialData->uvTransform = Multiply(Multiply(Make4x4ScaleMatrix(uvTransform.scale),
+		Make4x4RotateZMatrix(uvTransform.rotate.z)), Make4x4TranslateMatrix(uvTransform.translate));
+
+
+	// 座標変換用のリソース
+	Microsoft::WRL::ComPtr<ID3D12Resource> transformationMatrixResource = CreateBufferResource(device_, sizeof(TransformationMatrix));
+
+	// 行列に書き込む
+	TransformationMatrix* transformationMatrixData = nullptr;
+	transformationMatrixResource->Map(0, nullptr, reinterpret_cast<void**>(&transformationMatrixData));
+	transformationMatrixData->world = Make4x4AffineMatrix(transform.scale, transform.rotate, transform.translate);
+	transformationMatrixData->worldViewProjection = Multiply(transformationMatrixData->world, viewProjectionMatrix);
+
+
+	// 平行光源用のリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = CreateBufferResource(device_, sizeof(DirectionalLight));
+
+	// データを書き込む
+	DirectionalLight* directionalLightData = nullptr;
+	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
+	directionalLightData->color = light.color;
+	directionalLightData->direction = light.direction;
+	directionalLightData->intensity = light.intensity;
+
+
+
+	// VBVを設定する
+	commands_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+	// 形状を設定
+	commands_->GetCommandList()->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// マテリアル用のCBVを設定する
+	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+
+	// 座標変換用のCBVを設定する
+	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
+
+	// 平行光源用のCBVを設定する
+	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+
+	// テクスチャのCBVを設定する
+	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
+
+	// 描画する
+	commands_->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+
+
+	/*--------------------------------------
+		使用していないリソースメモリに記録する
+	--------------------------------------*/
 
 	for (uint32_t i = 0; i < kNumResourceMemories; i++)
 	{

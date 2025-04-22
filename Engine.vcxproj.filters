@@ -79,6 +79,12 @@
     <Filter Include="Class\Engine\Class\TextureManager">
       <UniqueIdentifier>{b25f08be-7709-4c18-967a-9a9698394a0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Func\ModelData">
+      <UniqueIdentifier>{658aac94-097b-4e1a-a57d-45eb62a3ec5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\Sound">
+      <UniqueIdentifier>{5a8036fc-2bf6-45e6-ba3e-78b6fc06d2bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -152,6 +158,12 @@
     </ClCompile>
     <ClCompile Include="Class\Engine\Class\TextureManager\TextureManager.cpp">
       <Filter>Class\Engine\Class\TextureManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Func\ModelData\ModelData.cpp">
+      <Filter>Class\Engine\Func\ModelData</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\Sound\Sound.cpp">
+      <Filter>Class\Engine\Class\Sound</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -229,6 +241,12 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Class\TextureManager\TextureManager.h">
       <Filter>Class\Engine\Class\TextureManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Func\ModelData\ModelData.h">
+      <Filter>Class\Engine\Func\ModelData</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\Sound\Sound.h">
+      <Filter>Class\Engine\Class\Sound</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

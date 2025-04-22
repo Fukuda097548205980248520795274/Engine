@@ -94,6 +94,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Class\Engine\Class\ErrorDetection\ErrorDetection.cpp" />
     <ClCompile Include="Class\Engine\Class\Fence\Fence.cpp" />
     <ClCompile Include="Class\Engine\Class\Shader\Shader.cpp" />
+    <ClCompile Include="Class\Engine\Class\Sound\Sound.cpp" />
     <ClCompile Include="Class\Engine\Class\SwapChain\SwapChain.cpp" />
     <ClCompile Include="Class\Engine\Class\TextureManager\TextureManager.cpp" />
     <ClCompile Include="Class\Engine\Class\Window\Window.cpp" />
@@ -109,6 +110,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="Class\Engine\Func\Create\Create.cpp" />
     <ClCompile Include="Class\Engine\Func\Get\Get.cpp" />
     <ClCompile Include="Class\Engine\Func\Matrix\Matrix.cpp" />
+    <ClCompile Include="Class\Engine\Func\ModelData\ModelData.cpp" />
     <ClCompile Include="Class\Engine\Func\StringInfo\StringInfo.cpp" />
     <ClCompile Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.cpp" />
     <ClCompile Include="Class\Engine\Func\Texture\Texture.cpp" />
@@ -120,6 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Class\Engine\Class\ErrorDetection\ErrorDetection.h" />
     <ClInclude Include="Class\Engine\Class\Fence\Fence.h" />
     <ClInclude Include="Class\Engine\Class\Shader\Shader.h" />
+    <ClInclude Include="Class\Engine\Class\Sound\Sound.h" />
     <ClInclude Include="Class\Engine\Class\SwapChain\SwapChain.h" />
     <ClInclude Include="Class\Engine\Class\TextureManager\TextureManager.h" />
     <ClInclude Include="Class\Engine\Class\Window\Window.h" />
@@ -136,6 +139,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="Class\Engine\Func\Create\Create.h" />
     <ClInclude Include="Class\Engine\Func\Get\Get.h" />
     <ClInclude Include="Class\Engine\Func\Matrix\Matrix.h" />
+    <ClInclude Include="Class\Engine\Func\ModelData\ModelData.h" />
     <ClInclude Include="Class\Engine\Func\StringInfo\StringInfo.h" />
     <ClInclude Include="Class\Engine\Class\Window\Func\WindowProc\WindowProc.h" />
     <ClInclude Include="Class\Engine\Func\Texture\Texture.h" />

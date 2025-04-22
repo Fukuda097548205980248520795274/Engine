@@ -9,6 +9,8 @@
 #include <filesystem>
 #include <fstream>
 #include <chrono>
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -23,6 +25,7 @@
 #include "Class/Fence/Fence.h"
 #include "Class/Shader/Shader.h"
 #include "Class/TextureManager/TextureManager.h"
+#include "Class/Sound/Sound.h"
 #include "Func/StringInfo/StringInfo.h"
 #include "Func/Matrix/Matrix.h"
 #include "Func/Create/Create.h"
@@ -30,7 +33,9 @@
 #include "Func/TransitionBarrier/TransitionBarrier.h"
 #include "Func/Crash/Crash.h"
 #include "Func/Texture/Texture.h"
+#include "Func/ModelData/ModelData.h"
 
+#pragma comment(lib , "dinput8.lib")
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -57,6 +62,12 @@ public:
 	// テクスチャを読み込む
 	uint32_t LoadTexture(const std::string& filePath);
 
+	// サウンドデータを読み込む
+	uint32_t LoadSound(const char* fileName);
+
+	// サウンドデータを再生する
+	void PlayerSoundWav(uint32_t soundHandle);
+
 	// 三角形を描画する
 	void DrawTriangle(struct Transform3D& transform, const DirectionalLight& light,
 		const Matrix4x4& viewProjectionMatrix,uint32_t textureHandle);
@@ -69,6 +80,14 @@ public:
 	void DrawSphere(uint32_t subdivisions,const Transform3D& transform, const Matrix4x4& viewProjectionMatrix,
 		const DirectionalLight& light, uint32_t textureHandle);
 
+	// モデルを描画する
+	void DrawModel(const std::string& directoryPath, const std::string& filename,
+		Transform3D& transform, const Matrix4x4& viewProjectionMatrix,const DirectionalLight& light, uint32_t textureHandle);
+
+
+	// ウィンドウ
+	Window* window_;
+
 
 private:
 
@@ -77,9 +96,6 @@ private:
 
 
 	/*   描画   */
-
-	// ウィンドウ
-	Window* window_;
 
 	// エラーを感知するクラス
 	ErrorDetection* errorDetection_;
@@ -149,6 +165,9 @@ private:
 
 	// テクスチャマネージャ
 	TextureManager* textureManager_;
+
+	// サウンド
+	Sound* sound_;
 
 
 

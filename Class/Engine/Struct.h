@@ -1,4 +1,6 @@
 #pragma once
+#include <vector>
+#include <string>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <dxgidebug.h>
@@ -31,6 +33,12 @@
 		float x;
 		float y;
 	}Vector2;
+
+	// 3x3行列
+	typedef struct Matrix3x3
+	{
+		float m[3][3];
+	}Matrix3x3;
 
 	// 4x4行列
 	typedef struct Matrix4x4
@@ -87,6 +95,11 @@
 
 		// ライティングを有効にするかどうか
 		int32_t enableLighting;
+
+		float padding[3];
+
+		// UV座標系
+		Matrix4x4 uvTransform;
 	}Material;
 
 	// 座標変換用行列
@@ -111,6 +124,63 @@
 		// 輝度
 		float intensity;
 	}DirectionalLight;
+
+	// マテリアルデータ
+	typedef struct MaterialData
+	{
+		std::string textureFilePath;
+	}MaterialData;
+
+
+	// モデルデータ
+	typedef struct ModelData
+	{
+		std::vector<VertexData> vertices;
+		MaterialData material;
+	}ModelData;
+
+	// チャンクヘッド
+	typedef struct ChunkHeader
+	{
+		// チャンク毎のID
+		char id[4];
+
+		// チャンクサイズ
+		int32_t size;
+	}ChunkHeader;
+
+	// RIFFヘッダチャンク
+	typedef struct RiffHeader
+	{
+		// RIFF
+		ChunkHeader chunk;
+
+		// WAVE
+		char type[4];
+	}RiffHeader;
+
+	// FMTチャンク
+	typedef struct FormatChunk
+	{
+		// フォーマット
+		ChunkHeader chunk;
+
+		// 波形フォーマット
+		WAVEFORMATEX fmt;
+	}FormatChunk;
+
+	// 音声データ
+	typedef struct SoundData
+	{
+		// 波形フォーマット
+		WAVEFORMATEX wfex;
+
+		// バッファの先頭アドレス
+		BYTE* pBuffer;
+
+		// バッファのサイズ
+		unsigned int bufferSize;
+	}SoundData;
 
 	// リソースリークチェッカー
 	typedef struct D3DResourceLeakChecker

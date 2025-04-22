@@ -19,6 +19,7 @@ public:
 
 	// Getter
 	HWND GetHwnd() { return hwnd_; }
+	WNDCLASS GetWndClass() { return wc_; }
 
 
 private:
