@@ -37,6 +37,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	uint32_t ghUvChecker = engine->LoadTexture("Resources/Textures/uvChecker.png");
 	uint32_t ghMonsterBall = engine->LoadTexture("Resources/Textures/monsterBall.png");
 
+	// モデル
+	uint32_t model = engine->LoadModelData("Resources/ModelDatas", "axis.obj");
+
 	// サウンド
 	uint32_t shAlarm01 = engine->LoadSound("Resources/Sounds/Se/Alarm01.wav");
 	uint32_t shAlarm02 = engine->LoadSound("Resources/Sounds/Se/Alarm02.wav");
@@ -57,7 +60,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 		ImGui::Begin("Triangle");
 		ImGui::DragFloat3("cmaera Translate", &cameraTransform.translate.x , 0.01f);
-		ImGui::DragFloat3("light normal", &light.direction.x, 0.01f);
+		ImGui::DragFloat3("rotation", &triangle.rotate.x, 0.01f);
 		ImGui::End();
 
 		Matrix4x4 viewMatrix = Make4x4InverseMatrix(Make4x4AffineMatrix(cameraTransform.scale, cameraTransform.rotate, cameraTransform.translate));
@@ -81,8 +84,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		///
 		/// ↓ 描画処理ここから
 		/// 
+		engine->DrawModel(model, triangle, Multiply(viewMatrix, projectionMatrix), light);
 		
-		engine->DrawTriangle(triangle, light, Multiply(viewMatrix, projectionMatrix), ghMonsterBall);
 
 		///
 		/// ↑ 描画処理ここまで

@@ -22,6 +22,9 @@ Engine::~Engine()
 	// サウンド
 	delete sound_;
 
+	// モデルマネージャ
+	delete modelManager_;
+
 	// テクスチャマネージャ
 	delete textureManager_;
 
@@ -190,6 +193,10 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	// テクスチャマネージャの初期化と生成
 	textureManager_ = new TextureManager();
 	textureManager_->Initialize();
+
+	// モデルマネージャの初期化と生成
+	modelManager_ = new ModelManager();
+	modelManager_->Initialize();
 
 	// サウンドの初期化と生成
 	sound_ = new Sound();
@@ -536,6 +543,17 @@ void Engine::EndFrame()
 uint32_t Engine::LoadTexture(const std::string& filePath)
 {
 	return textureManager_->LoadTextureGetNumber(filePath, device_, srvDescriptorHeap_, commands_->GetCommandList());
+}
+
+// モデルデータを読み込む
+uint32_t Engine::LoadModelData(const std::string& directory, const std::string& fileName)
+{
+	uint32_t modelNumber = modelManager_->LoadModelGetNumber(directory, fileName);
+	modelManager_->SetTextureNumber(modelNumber,
+		textureManager_->LoadTextureGetNumber(modelManager_->GetModelData(modelNumber).material.textureFilePath,
+			device_, srvDescriptorHeap_, commands_->GetCommandList()));
+
+	return modelNumber;
 }
 
 // サウンドデータを読み込む
@@ -1098,8 +1116,7 @@ void Engine::DrawSphere(uint32_t subdivisions,const Transform3D& transform, cons
 }
 
 // モデルを描画する
-void Engine::DrawModel(const std::string& directoryPath, const std::string& filename,
-	Transform3D& transform, const Matrix4x4& viewProjectionMatrix, const DirectionalLight& light , uint32_t textureHandle)
+void Engine::DrawModel(uint32_t modelHandle ,Transform3D& transform, const Matrix4x4& viewProjectionMatrix, const DirectionalLight& light)
 {
 	// ビューポートの設定
 	commands_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -1114,22 +1131,21 @@ void Engine::DrawModel(const std::string& directoryPath, const std::string& file
 	commands_->GetCommandList()->SetPipelineState(graphicsPipelineState_.Get());
 
 
-	// モデルデータ読み込み
-	ModelData modelData = LoadObjFile(directoryPath, filename);
-
 	// 頂点リソースを作成する
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, UINT(sizeof(VertexData) * modelData.vertices.size()));
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = 
+		CreateBufferResource(device_,UINT(sizeof(VertexData) * modelManager_->GetModelData(modelHandle).vertices.size()));
 	
 	// VBVを設定する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
+	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelManager_->GetModelData(modelHandle).vertices.size());
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// 頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
-	std::memcpy(vertexData, modelData.vertices.data(), sizeof(VertexData) * modelData.vertices.size());
+	std::memcpy(vertexData, modelManager_->GetModelData(modelHandle).vertices.data(),
+		sizeof(VertexData) * modelManager_->GetModelData(modelHandle).vertices.size());
 	
 
 
@@ -1186,10 +1202,10 @@ void Engine::DrawModel(const std::string& directoryPath, const std::string& file
 	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 	// テクスチャのCBVを設定する
-	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
+	textureManager_->SelectTexture(modelManager_->GetTextureNumber(modelHandle), commands_->GetCommandList());
 
 	// 描画する
-	commands_->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+	commands_->GetCommandList()->DrawInstanced(UINT(modelManager_->GetModelData(modelHandle).vertices.size()), 1, 0, 0);
 
 
 	/*--------------------------------------

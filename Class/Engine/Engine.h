@@ -27,6 +27,7 @@
 #include "Class/TextureManager/TextureManager.h"
 #include "Class/Sound/Sound.h"
 #include "Class/Input/Input.h"
+#include "Class/ModelManager/ModelManager.h"
 #include "Func/StringInfo/StringInfo.h"
 #include "Func/Matrix/Matrix.h"
 #include "Func/Create/Create.h"
@@ -63,6 +64,9 @@ public:
 	// テクスチャを読み込む
 	uint32_t LoadTexture(const std::string& filePath);
 
+	// モデルデータを読み込む
+	uint32_t LoadModelData(const std::string& directory, const std::string& fileName);
+
 	// サウンドデータを読み込む
 	uint32_t LoadSound(const char* fileName);
 
@@ -91,8 +95,7 @@ public:
 		const DirectionalLight& light, uint32_t textureHandle);
 
 	// モデルを描画する
-	void DrawModel(const std::string& directoryPath, const std::string& filename,
-		Transform3D& transform, const Matrix4x4& viewProjectionMatrix,const DirectionalLight& light, uint32_t textureHandle);
+	void DrawModel(uint32_t modelHandle, Transform3D& transform, const Matrix4x4& viewProjectionMatrix, const DirectionalLight& light);
 
 
 private:
@@ -178,6 +181,9 @@ private:
 
 	// テクスチャマネージャ
 	TextureManager* textureManager_;
+
+	// モデルマネージャ
+	ModelManager* modelManager_;
 
 	// サウンド
 	Sound* sound_;

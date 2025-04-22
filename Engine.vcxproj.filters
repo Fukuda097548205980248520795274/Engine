@@ -88,6 +88,12 @@
     <Filter Include="Class\Engine\Class\Input">
       <UniqueIdentifier>{cc7a66f7-07ee-4c83-91a2-b84efd81abee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Class\DebugCamera">
+      <UniqueIdentifier>{55fb6466-9bcf-4e45-88d4-4d82f7d70a5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Class\Engine\Class\ModelManager">
+      <UniqueIdentifier>{9690b237-cc34-4c48-8493-e2fa1bf0c374}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -170,6 +176,12 @@
     </ClCompile>
     <ClCompile Include="Class\Engine\Class\Input\Input.cpp">
       <Filter>Class\Engine\Class\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\DebugCamera\DebugCamera.cpp">
+      <Filter>Class\Engine\Class\DebugCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\ModelManager\ModelManager.cpp">
+      <Filter>Class\Engine\Class\ModelManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +268,12 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Class\Input\Input.h">
       <Filter>Class\Engine\Class\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\DebugCamera\DebugCamera.h">
+      <Filter>Class\Engine\Class\DebugCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\ModelManager\ModelManager.h">
+      <Filter>Class\Engine\Class\ModelManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
