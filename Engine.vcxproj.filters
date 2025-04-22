@@ -85,6 +85,9 @@
     <Filter Include="Class\Engine\Class\Sound">
       <UniqueIdentifier>{5a8036fc-2bf6-45e6-ba3e-78b6fc06d2bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Class\Engine\Class\Input">
+      <UniqueIdentifier>{cc7a66f7-07ee-4c83-91a2-b84efd81abee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -164,6 +167,9 @@
     </ClCompile>
     <ClCompile Include="Class\Engine\Class\Sound\Sound.cpp">
       <Filter>Class\Engine\Class\Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="Class\Engine\Class\Input\Input.cpp">
+      <Filter>Class\Engine\Class\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -247,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="Class\Engine\Class\Sound\Sound.h">
       <Filter>Class\Engine\Class\Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Class\Engine\Class\Input\Input.h">
+      <Filter>Class\Engine\Class\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

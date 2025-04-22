@@ -7,27 +7,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	engine->Initialize(1280, 720);
 
 
-	/*   DirectInput   */
-
-	// DirectInputを初期化する
-	IDirectInput8* directInput_ = nullptr;
-	HRESULT hr = DirectInput8Create(engine->window_->GetWndClass().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&directInput_, nullptr);
-	assert(SUCCEEDED(hr));
-
-	// キーボードデバイスを初期化する
-	IDirectInputDevice8* keyboard_ = nullptr;
-	hr = directInput_->CreateDevice(GUID_SysKeyboard, &keyboard_, NULL);
-	assert(SUCCEEDED(hr));
-
-	// 入力データ形式のセット
-	hr = keyboard_->SetDataFormat(&c_dfDIKeyboard);
-	assert(SUCCEEDED(hr));
-
-	// 排他レベルセット
-	hr = keyboard_->SetCooperativeLevel(engine->window_->GetHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
-	assert(SUCCEEDED(hr));
-
-
 
 
 	// カメラ
@@ -56,6 +35,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// テクスチャ
 	uint32_t ghUvChecker = engine->LoadTexture("Resources/Textures/uvChecker.png");
+	uint32_t ghMonsterBall = engine->LoadTexture("Resources/Textures/monsterBall.png");
 
 	// サウンド
 	uint32_t shAlarm01 = engine->LoadSound("Resources/Sounds/Se/Alarm01.wav");
@@ -71,11 +51,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// フレーム開始
 		engine->BeginFrame();
 
-		keyboard_->Acquire();
-		BYTE key[256] = {};
-		keyboard_->GetDeviceState(sizeof(key), key);
-
-
 		///
 		/// ↓ 更新処理ここから
 		/// 
@@ -89,12 +64,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		Matrix4x4 projectionMatrix = Make4x4PerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 		Matrix4x4 orthoMatrix = Make4x4OrthographicsMatrix(0.0f, 0.0f, 1280.0f, 720.0f, 0.0f, 100.0f);
 
-		if (key[DIK_A])
+		if (engine->PushTriggerKeys(DIK_A))
 		{
 			engine->PlayerSoundWav(shAlarm02);
 		}
 
-		if (key[DIK_D])
+		if (engine->PushTriggerKeys(DIK_D))
 		{
 			engine->PlayerSoundWav(shAlarm03);
 		}
@@ -107,7 +82,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 描画処理ここから
 		/// 
 		
-		engine->DrawTriangle(triangle, light, Multiply(viewMatrix, projectionMatrix), ghUvChecker);
+		engine->DrawTriangle(triangle, light, Multiply(viewMatrix, projectionMatrix), ghMonsterBall);
 
 		///
 		/// ↑ 描画処理ここまで
@@ -116,7 +91,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// フレーム終了
 		engine->EndFrame();
 
-		if (key[DIK_ESCAPE])
+		if (engine->PushTriggerKeys(DIK_ESCAPE))
 		{
 			break;
 		}

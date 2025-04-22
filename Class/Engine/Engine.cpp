@@ -37,6 +37,9 @@ Engine::~Engine()
 	// エラー検知
 	delete errorDetection_;
 
+	// 入力
+	delete input_;
+
 	// ウィンドウ
 	delete window_;
 
@@ -85,6 +88,10 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	// ウィンドウの生成と初期化
 	window_ = new Window();
 	window_->Initialize(kClientWidth,kClientHeight);
+
+	// 入力の生成と初期化
+	input_ = new Input();
+	input_->Initialize(window_->GetWndClass().hInstance , window_->GetHwnd());
 
 	// エラーを感知するクラス
 	errorDetection_ = new ErrorDetection();
@@ -454,6 +461,8 @@ void Engine::BeginFrame()
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	input_->Acquire();
+
 	// バックバッファのインデックスを取得する
 	UINT backBufferIndex = swapChain_->GetCurrentBackBufferIndex();
 
@@ -519,6 +528,8 @@ void Engine::EndFrame()
 			resourceMemories[i] = nullptr;
 		}
 	}
+
+	input_->CopyKeys();
 }
 
 // テクスチャを読み込む
@@ -537,6 +548,24 @@ uint32_t Engine::LoadSound(const char* fileName)
 void Engine::PlayerSoundWav(uint32_t soundHandle)
 {
 	sound_->SelectNumberPlaySoundWav(soundHandle);
+}
+
+// キー操作（Press）
+UINT Engine::PushPressKeys(BYTE key)
+{
+	return input_->PressKeys(key);
+}
+
+// キー操作（Trigger）
+UINT Engine::PushTriggerKeys(BYTE key)
+{
+	return input_->TriggerKeys(key);
+}
+
+// キー操作（Release）
+UINT Engine::PushReleaseKeys(BYTE key)
+{
+	return input_->ReleaseKeys(key);
 }
 
 // 三角形を描画する

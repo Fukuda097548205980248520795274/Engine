@@ -26,6 +26,7 @@
 #include "Class/Shader/Shader.h"
 #include "Class/TextureManager/TextureManager.h"
 #include "Class/Sound/Sound.h"
+#include "Class/Input/Input.h"
 #include "Func/StringInfo/StringInfo.h"
 #include "Func/Matrix/Matrix.h"
 #include "Func/Create/Create.h"
@@ -68,6 +69,15 @@ public:
 	// サウンドデータを再生する
 	void PlayerSoundWav(uint32_t soundHandle);
 
+	// キー操作（Press）
+	UINT PushPressKeys(BYTE key);
+
+	// キー操作（Trigger）
+	UINT PushTriggerKeys(BYTE key);
+
+	// キー操作（Release）
+	UINT PushReleaseKeys(BYTE key);
+
 	// 三角形を描画する
 	void DrawTriangle(struct Transform3D& transform, const DirectionalLight& light,
 		const Matrix4x4& viewProjectionMatrix,uint32_t textureHandle);
@@ -85,14 +95,17 @@ public:
 		Transform3D& transform, const Matrix4x4& viewProjectionMatrix,const DirectionalLight& light, uint32_t textureHandle);
 
 
-	// ウィンドウ
-	Window* window_;
-
-
 private:
 
 	// リークチェッカー
 	D3DResourceLeakChecker leakChecker;
+
+
+	// ウィンドウ
+	Window* window_;
+
+	// 入力
+	Input* input_;
 
 
 	/*   描画   */
