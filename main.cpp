@@ -32,9 +32,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 色
 	Vector3 color = { 1.0f , 1.0f , 1.0f };
 
-	// モデルデータ
-	uint32_t mdMonky = engine->LoadModelData("Resources/ModelDatas/monky", "monky.obj");
-
 	// テクスチャ
 	uint32_t ghUvChecker = engine->LoadTexture("Resources/Textures/uvChecker.png");
 
