@@ -1,5 +1,4 @@
 #pragma once
-#include <Windows.h>
 #include <stdint.h>
 #include "./Func/WindowProc/WindowProc.h"
 

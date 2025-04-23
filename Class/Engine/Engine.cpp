@@ -172,15 +172,12 @@ void Engine::Initialize(const int32_t kClientWidth , const int32_t kClientHeight
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
 
-	// ディスクリプタの先頭の取得する
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap_->GetCPUDescriptorHandleForHeapStart();
-
 	// 1つめ　先頭
-	rtvHandles_[0] = rtvStartHandle;
+	rtvHandles_[0] = GetCPUDescriptorHandle(rtvDescriptorHeap_, device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV), 0);
 	device_->CreateRenderTargetView(swapChainResource_[0].Get(), &rtvDesc, rtvHandles_[0]);
 
 	// 2つめ
-	rtvHandles_[1].ptr = rtvHandles_[0].ptr + device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+	rtvHandles_[1] = GetCPUDescriptorHandle(rtvDescriptorHeap_, device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV), 1);
 	device_->CreateRenderTargetView(swapChainResource_[1].Get(), &rtvDesc, rtvHandles_[1]);
 
 
@@ -587,8 +584,7 @@ UINT Engine::PushReleaseKeys(BYTE key)
 }
 
 // 三角形を描画する
-void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight& light,
-	const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle)
+void Engine::DrawTriangle(struct Transform3D& transform,const Matrix4x4& viewProjectionMatrix, uint32_t textureHandle, Vector3 color)
 {
 	// ビューポートの設定
 	commands_->GetCommandList()->RSSetViewports(1, &viewport_);
@@ -635,7 +631,7 @@ void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight&
 
 	Transform3D uvTransform = { {1.0f , 1.0f , 1.0f} , {0.0f , 0.0f , 0.0f} , {0.0f , 0.0f , 0.0f} };
 
-	materialData->color = {1.0f , 1.0f , 1.0f , 1.0f};
+	materialData->color = {color.x , color.y , color.z , 1.0f};
 	materialData->enableLighting = false;
 	materialData->uvTransform = Multiply(Multiply(Make4x4ScaleMatrix(uvTransform.scale),
 		Make4x4RotateZMatrix(uvTransform.rotate.z)), Make4x4TranslateMatrix(uvTransform.translate));
@@ -651,17 +647,6 @@ void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight&
 	transformationMatrixData->worldViewProjection = Multiply(transformationMatrixData->world, viewProjectionMatrix);
 
 
-	// 平行光源用のリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> directionalLightResource = CreateBufferResource(device_, sizeof(DirectionalLight));
-
-	// データを書き込む
-	DirectionalLight* directionalLightData = nullptr;
-	directionalLightResource->Map(0, nullptr, reinterpret_cast<void**>(&directionalLightData));
-	directionalLightData->color = light.color;
-	directionalLightData->direction = light.direction;
-	directionalLightData->intensity = light.intensity;
-
-
 	// VBVを設定する
 	commands_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView);
 
@@ -673,9 +658,6 @@ void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight&
 
 	// 座標変換用のCBVを設定する
 	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(1, transformationMatrixResource->GetGPUVirtualAddress());
-
-	// 平行光源用のCBVを設定する
-	commands_->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
 	// テクスチャのCBVを設定する
 	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
@@ -711,15 +693,6 @@ void Engine::DrawTriangle(struct Transform3D& transform, const DirectionalLight&
 		if (resourceMemories[i] == nullptr)
 		{
 			resourceMemories[i] = transformationMatrixResource;
-			break;
-		}
-	}
-
-	for (uint32_t i = 0; i < kNumResourceMemories; i++)
-	{
-		if (resourceMemories[i] == nullptr)
-		{
-			resourceMemories[i] = directionalLightResource;
 			break;
 		}
 	}

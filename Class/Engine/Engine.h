@@ -1,23 +1,10 @@
 #pragma once
-#include <Windows.h>
 #define _USE_MATH_DEFINES
 #include <cmath>
-#include <wrl.h>
-#include <stdint.h>
-#include <string>
-#include <cassert>
 #include <filesystem>
 #include <fstream>
 #include <chrono>
-#define DIRECTINPUT_VERSION 0x0800
-#include <dinput.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-#include <dxgidebug.h>
 #include "Struct.h"
-#include "externals/imgui/imgui.h"
-#include "externals/imgui/imgui_impl_dx12.h"
-#include "externals/imgui/imgui_impl_win32.h"
 #include "Class/Window/Window.h"
 #include "Class/ErrorDetection/ErrorDetection.h"
 #include "Class/Commands/Commands.h"
@@ -36,11 +23,6 @@
 #include "Func/Crash/Crash.h"
 #include "Func/Texture/Texture.h"
 #include "Func/ModelData/ModelData.h"
-
-#pragma comment(lib , "dinput8.lib")
-#pragma comment(lib,"d3d12.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "dxguid.lib")
 
 class Engine
 {
@@ -83,8 +65,7 @@ public:
 	UINT PushReleaseKeys(BYTE key);
 
 	// 三角形を描画する
-	void DrawTriangle(struct Transform3D& transform, const DirectionalLight& light,
-		const Matrix4x4& viewProjectionMatrix,uint32_t textureHandle);
+	void DrawTriangle(struct Transform3D& transform,const Matrix4x4& viewProjectionMatrix,uint32_t textureHandle , Vector3 color);
 
 	// スプライトを描画する
 	void DrawSprite(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4,
@@ -111,11 +92,8 @@ private:
 	Input* input_;
 
 
-	/*   描画   */
-
 	// エラーを感知するクラス
 	ErrorDetection* errorDetection_;
-
 
 
 	// DXGIファクトリ
@@ -178,7 +156,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D12Resource> resourceMemories[1024] = { nullptr };
 
 
-
 	// テクスチャマネージャ
 	TextureManager* textureManager_;
 
@@ -188,9 +165,6 @@ private:
 	// サウンド
 	Sound* sound_;
 
-
-
-	/*   描画設定   */
 
 	// シェーダー
 	Shader* shader_;
