@@ -600,12 +600,12 @@ void Engine::DrawTriangle(struct Transform3D& transform,const Matrix4x4& viewPro
 
 
 	// 頂点リソースを作る
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 3);
+	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource = CreateBufferResource(device_, sizeof(VertexData) * 6);
 
 	// VBVを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView{};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(VertexData) * 3;
+	vertexBufferView.SizeInBytes = sizeof(VertexData) * 6;
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	// データを書き込む
@@ -620,6 +620,15 @@ void Engine::DrawTriangle(struct Transform3D& transform,const Matrix4x4& viewPro
 	vertexData[2].position= { -0.5f , -0.5f , 0.0f , 1.0f };
 	vertexData[2].texcoord = { 0.0f , 1.0f };
 	vertexData[2].normal = { vertexData[2].position.x , vertexData[2].position.y , vertexData[2].position.z };
+	vertexData[3].position = { 0.0f , 0.0f , 0.0f , 1.0f };
+	vertexData[3].texcoord = { 0.5f , 0.0f };
+	vertexData[3].normal = { vertexData[0].position.x , vertexData[0].position.y , vertexData[0].position.z };
+	vertexData[4].position = { 0.0f , -0.5f , -0.5f , 1.0f };
+	vertexData[4].texcoord = { 1.0f , 1.0f };
+	vertexData[4].normal = { vertexData[1].position.x , vertexData[1].position.y , vertexData[1].position.z };
+	vertexData[5].position = { 0.0f , -0.5f , 0.5f , 1.0f };
+	vertexData[5].texcoord = { 0.0f , 1.0f };
+	vertexData[5].normal = { vertexData[2].position.x , vertexData[2].position.y , vertexData[2].position.z };
 
 
 	// マテリアル用のリソースを作る
@@ -663,7 +672,7 @@ void Engine::DrawTriangle(struct Transform3D& transform,const Matrix4x4& viewPro
 	textureManager_->SelectTexture(textureHandle, commands_->GetCommandList());
 
 	// 描画する
-	commands_->GetCommandList()->DrawInstanced(3, 1, 0, 0);
+	commands_->GetCommandList()->DrawInstanced(6, 1, 0, 0);
 
 	
 	/*--------------------------------------

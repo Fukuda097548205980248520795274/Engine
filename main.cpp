@@ -47,15 +47,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 更新処理ここから
 		/// 
 
-		ImGui::Begin("Triangle");
-		ImGui::ColorEdit3("color", &color.x);
-		ImGui::DragFloat3("scale",&triangle.scale.x , 0.01f);
-		ImGui::DragFloat3("rotation",&triangle.rotate.x , 0.01f);
-		ImGui::DragFloat3("translation", &triangle.translate.x, 0.01f);
+		ImGui::Begin("triangle");
+		ImGui::DragFloat3("scale", &triangle.scale.x, 0.01f);
+		ImGui::DragFloat3("rotation", &triangle.rotate.x, 0.01f);
+		ImGui::DragFloat3("translation",&triangle.translate.x , 0.01f);
 		ImGui::End();
 
+		
 		Matrix4x4 viewMatrix = Make4x4InverseMatrix(Make4x4AffineMatrix(camera.scale, camera.rotate, camera.translate));
-		Matrix4x4 projectionMatrix = Make4x4PerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
+		Matrix4x4 projectionMatrix = Make4x4PerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 1800.0f);
+
+		triangle.rotate.y += 0.03f;
 
 		///
 		/// ↑ 更新処理ここまで
