@@ -15,6 +15,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{0.0f , 0.0f , -5.0f}
 	};
 
+	// ライト
+	DirectionalLight light;
+	light.color = { 1.0f , 1.0f , 1.0f , 1.0f };
+	light.direction = { 0.0f , -1.0f , 0.0f };
+	light.intensity = 1.0f;
+
 	// 三角形
 	Transform3D triangle
 	{
@@ -32,7 +38,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 
 	// メインループ
-	while(engine->IsWindowOpen())
+	while (engine->IsWindowOpen())
 	{
 		// フレーム開始
 		engine->BeginFrame();
@@ -41,17 +47,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 更新処理ここから
 		/// 
 
-		ImGui::Begin("triangle");
+		ImGui::Begin("Triangle");
+		ImGui::ColorEdit3("color", &color.x);
 		ImGui::DragFloat3("scale", &triangle.scale.x, 0.01f);
 		ImGui::DragFloat3("rotation", &triangle.rotate.x, 0.01f);
-		ImGui::DragFloat3("translation",&triangle.translate.x , 0.01f);
+		ImGui::DragFloat3("translation", &triangle.translate.x, 0.01f);
 		ImGui::End();
 
-		
 		Matrix4x4 viewMatrix = Make4x4InverseMatrix(Make4x4AffineMatrix(camera.scale, camera.rotate, camera.translate));
-		Matrix4x4 projectionMatrix = Make4x4PerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 1800.0f);
-
-		triangle.rotate.y += 0.03f;
+		Matrix4x4 projectionMatrix = Make4x4PerspectiveFovMatrix(0.45f, 1280.0f / 720.0f, 0.1f, 100.0f);
 
 		///
 		/// ↑ 更新処理ここまで
@@ -61,7 +65,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 描画処理ここから
 		/// 
 
-		// 三角形
 		engine->DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), ghUvChecker, color);
 
 		///
