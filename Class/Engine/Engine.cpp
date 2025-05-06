@@ -613,22 +613,22 @@ void Engine::DrawTriangle(struct Transform3D& transform,const Matrix4x4& viewPro
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexData));
 	vertexData[0].position = { 0.0f , 0.5f , 0.0f , 1.0f };
 	vertexData[0].texcoord = { 0.5f , 0.0f };
-	vertexData[0].normal = { vertexData[0].position.x , vertexData[0].position.y , vertexData[0].position.z };
+	vertexData[0].normal = { 0.0f,0.0f,0.0f };
 	vertexData[1].position = { 0.5f , -0.5f , 0.0f , 1.0f };
 	vertexData[1].texcoord = { 1.0f , 1.0f };
-	vertexData[1].normal = { vertexData[1].position.x , vertexData[1].position.y , vertexData[1].position.z };
+	vertexData[1].normal = { 0.0f,0.0f,0.0f };
 	vertexData[2].position= { -0.5f , -0.5f , 0.0f , 1.0f };
 	vertexData[2].texcoord = { 0.0f , 1.0f };
-	vertexData[2].normal = { vertexData[2].position.x , vertexData[2].position.y , vertexData[2].position.z };
+	vertexData[2].normal = { 0.0f,0.0f,0.0f };
 	vertexData[3].position = { 0.0f , 0.0f , 0.0f , 1.0f };
 	vertexData[3].texcoord = { 0.5f , 0.0f };
-	vertexData[3].normal = { vertexData[0].position.x , vertexData[0].position.y , vertexData[0].position.z };
+	vertexData[3].normal = { 0.0f,0.0f,0.0f };
 	vertexData[4].position = { 0.0f , -0.5f , -0.5f , 1.0f };
 	vertexData[4].texcoord = { 1.0f , 1.0f };
-	vertexData[4].normal = { vertexData[1].position.x , vertexData[1].position.y , vertexData[1].position.z };
+	vertexData[4].normal = { 0.0f,0.0f,0.0f };
 	vertexData[5].position = { 0.0f , -0.5f , 0.5f , 1.0f };
 	vertexData[5].texcoord = { 0.0f , 1.0f };
-	vertexData[5].normal = { vertexData[2].position.x , vertexData[2].position.y , vertexData[2].position.z };
+	vertexData[5].normal = { 0.0f,0.0f,0.0f };
 
 
 	// マテリアル用のリソースを作る

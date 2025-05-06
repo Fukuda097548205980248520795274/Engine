@@ -15,12 +15,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		{0.0f , 0.0f , -5.0f}
 	};
 
-	// ライト
-	DirectionalLight light;
-	light.color = { 1.0f , 1.0f , 1.0f , 1.0f };
-	light.direction = { 0.0f , -1.0f , 0.0f };
-	light.intensity = 1.0f;
-
 	// 三角形
 	Transform3D triangle
 	{
