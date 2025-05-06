@@ -61,6 +61,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		/// ↓ 描画処理ここから
 		/// 
 
+		// 三角形
 		engine->DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), ghUvChecker, color);
 
 		///
